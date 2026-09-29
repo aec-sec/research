@@ -1,0 +1,400 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const protocols = (await getCollection('protocols'))
+	.filter((protocol) => !protocol.data.draft)
+	.sort((a, b) => a.data.title.localeCompare(b.data.title));
+
+const categories = [...new Set(
+	protocols.map((protocol) => protocol.data.category)
+)];
+---
+
+<Layout
+	title="Protocols | AEC Security"
+	description="Technical reference material covering common network protocols, services, enumeration techniques and security considerations."
+>
+	<main>
+		<section class="hero">
+			<div class="breadcrumb">
+				<a href="/">AECSEC</a>
+				<span>/</span>
+				<span>PROTOCOLS</span>
+			</div>
+
+			<span class="eyebrow">TECHNICAL REFERENCE</span>
+		</section>
+
+		<section class="protocol-archive">
+			<div class="archive-header">
+				<div>
+					<h2>Network Protocols & Services</h2>
+				</div>
+
+				<span class="count">
+					{protocols.length}
+					{protocols.length === 1 ? ' ENTRY' : ' ENTRIES'}
+				</span>
+			</div>
+
+			{categories.length > 0 && (
+				<div class="filters">
+					<button class="active" type="button">All</button>
+
+					{categories.map((category) => (
+						<button type="button">{category}</button>
+					))}
+				</div>
+			)}
+
+			{protocols.length > 0 ? (
+				<div class="protocol-list">
+					{protocols.map((protocol) => (
+						<a
+							class="protocol"
+							href={`/protocols/${protocol.id}`}
+						>
+							<div class="protocol-port">
+								<span>{protocol.data.port}</span>
+								<small>{protocol.data.transport}</small>
+							</div>
+
+							<div class="protocol-main">
+								<div class="meta">
+									<span>{protocol.data.category}</span>
+								</div>
+
+								<h3>{protocol.data.title}</h3>
+
+								<p>{protocol.data.description}</p>
+
+								{protocol.data.tags.length > 0 && (
+									<div class="tags">
+										{protocol.data.tags.map((tag) => (
+											<span>{tag}</span>
+										))}
+									</div>
+								)}
+							</div>
+
+							<div class="protocol-side">
+								<span class="arrow">→</span>
+							</div>
+						</a>
+					))}
+				</div>
+			) : (
+				<div class="empty-state">
+					<span class="empty-code">PROTOCOL_DATABASE_EMPTY</span>
+
+					<h3>No protocol references published yet.</h3>
+
+					<p>
+						Protocol and network service documentation will appear
+						here as it is published.
+					</p>
+				</div>
+			)}
+		</section>
+	</main>
+</Layout>
+
+<style>
+	main {
+		max-width: 1320px;
+		margin: 0 auto;
+		padding: 0 32px;
+	}
+
+	.hero {
+		padding: 75px 0 6px;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.breadcrumb {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		margin-bottom: 55px;
+
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 11px;
+		letter-spacing: 0.08em;
+		color: var(--text-muted);
+	}
+
+	.breadcrumb a {
+		color: var(--accent);
+		text-decoration: none;
+	}
+
+	.eyebrow {
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 11px;
+		letter-spacing: 0.14em;
+		color: var(--accent);
+	}
+
+	h1 {
+		margin: 12px 0 22px;
+		font-size: clamp(48px, 6vw, 72px);
+		line-height: 1;
+		letter-spacing: -0.05em;
+	}
+
+	.hero-description {
+		max-width: 760px;
+		margin: 0;
+		color: var(--text-muted);
+		font-size: 16px;
+		line-height: 1.8;
+	}
+
+	.protocol-archive {
+		padding: 18px 0 110px;
+	}
+
+	.archive-header {
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 30px;
+		margin-bottom: 28px;
+	}
+
+	.archive-header h2 {
+		margin: 8px 0 0;
+		font-size: 32px;
+		letter-spacing: -0.03em;
+	}
+
+	.count {
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 10px;
+		letter-spacing: 0.1em;
+		color: var(--text-muted);
+	}
+
+	.filters {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 7px;
+		margin-bottom: 35px;
+	}
+
+	.filters button {
+		padding: 7px 10px;
+		border: 1px solid var(--border);
+		border-radius: 5px;
+		background: var(--surface);
+		color: var(--text-muted);
+		cursor: pointer;
+	}
+
+	.filters button.active {
+		border-color: var(--accent);
+		background: var(--accent-muted);
+		color: var(--accent);
+	}
+
+	.protocol-list {
+		border-top: 1px solid var(--border);
+	}
+
+	.protocol {
+		display: grid;
+		grid-template-columns: 120px minmax(0, 1fr) auto;
+		align-items: center;
+		gap: 35px;
+
+		padding: 30px 8px;
+		border-bottom: 1px solid var(--border);
+
+		color: inherit;
+		text-decoration: none;
+
+		transition:
+			padding 150ms ease,
+			background 150ms ease;
+	}
+
+	.protocol:hover {
+		padding-left: 16px;
+		padding-right: 16px;
+		background: var(--surface);
+	}
+
+	.protocol-port {
+		align-self: start;
+
+		display: flex;
+		flex-direction: column;
+		gap: 5px;
+
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+	}
+
+	.protocol-port span {
+		color: var(--accent);
+		font-size: 16px;
+		font-weight: 600;
+	}
+
+	.protocol-port small {
+		color: var(--text-muted);
+		font-size: 9px;
+		letter-spacing: 0.08em;
+	}
+
+	.meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 10px;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--text-muted);
+	}
+
+	.protocol h3 {
+		margin: 9px 0 7px;
+		font-size: 20px;
+	}
+
+	.protocol p {
+		max-width: 800px;
+		margin: 0;
+		color: var(--text-muted);
+		font-size: 13px;
+		line-height: 1.65;
+	}
+
+	.tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		margin-top: 17px;
+	}
+
+	.tags span {
+		padding: 4px 7px;
+		border: 1px solid var(--border);
+		border-radius: 4px;
+		background: var(--tag-background);
+
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 9px;
+		color: var(--text-muted);
+	}
+
+	.protocol-side {
+		display: flex;
+		align-items: center;
+	}
+
+	.arrow {
+		font-size: 22px;
+		color: var(--text-muted);
+		transition: 150ms ease;
+	}
+
+	.protocol:hover .arrow {
+		color: var(--accent);
+		transform: translateX(3px);
+	}
+
+	.empty-state {
+		padding: 90px 30px;
+		border: 1px dashed var(--border);
+		border-radius: 8px;
+		background: var(--surface);
+		text-align: center;
+	}
+
+	.empty-code {
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 10px;
+		letter-spacing: 0.12em;
+		color: var(--accent);
+	}
+
+	.empty-state h3 {
+		margin: 14px 0 10px;
+		font-size: 21px;
+	}
+
+	.empty-state p {
+		margin: 0;
+		color: var(--text-muted);
+		font-size: 14px;
+	}
+
+	@media (max-width: 800px) {
+		.protocol {
+			grid-template-columns: 85px minmax(0, 1fr) auto;
+			gap: 20px;
+		}
+	}
+
+	@media (max-width: 650px) {
+		main {
+			padding: 0 18px;
+		}
+
+		.hero {
+			padding: 55px 0;
+		}
+
+		.breadcrumb {
+			margin-bottom: 40px;
+		}
+
+		.protocol-archive {
+			padding-top: 60px;
+		}
+
+		.archive-header {
+			align-items: flex-start;
+			flex-direction: column;
+		}
+
+		.protocol {
+			grid-template-columns: 1fr;
+			gap: 12px;
+		}
+
+		.protocol-side {
+			display: none;
+		}
+	}
+</style>

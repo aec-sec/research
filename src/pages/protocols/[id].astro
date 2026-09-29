@@ -1,0 +1,411 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+	const protocols = (await getCollection('protocols'))
+		.filter((protocol) => !protocol.data.draft);
+
+	return protocols.map((protocol) => ({
+		params: {
+			id: protocol.id,
+		},
+		props: {
+			protocol,
+		},
+	}));
+}
+
+const { protocol } = Astro.props;
+
+const { Content, headings } = await render(protocol);
+
+const tocHeadings = headings.filter(
+	(heading) => heading.depth === 2 || heading.depth === 3
+);
+
+const wordCount = protocol.body
+	.trim()
+	.split(/\s+/)
+	.filter(Boolean)
+	.length;
+
+const readingTime = Math.max(1, Math.ceil(wordCount / 200));
+---
+
+<Layout
+	title={`${protocol.data.title} | Protocols | AEC Security`}
+	description={protocol.data.description}
+>
+	<main>
+		<header class="protocol-header">
+			<div class="breadcrumb">
+				<a href="/">AECSEC</a>
+				<span>/</span>
+				<a href="/protocols">PROTOCOLS</a>
+				<span>/</span>
+				<span>{protocol.data.title.toUpperCase()}</span>
+			</div>
+
+			<div class="protocol-meta">
+				<span>{protocol.data.category}</span>
+				<span>/</span>
+				<span>{protocol.data.transport}</span>
+				<span>/</span>
+				<span>{readingTime} MIN READ</span>
+			</div>
+
+			<h1>{protocol.data.title}</h1>
+
+			<p class="description">
+				{protocol.data.description}
+			</p>
+
+			<div class="protocol-information">
+				<div>
+					<span class="info-label">PORT</span>
+					<span class="info-value">{protocol.data.port}</span>
+				</div>
+
+				<div>
+					<span class="info-label">TRANSPORT</span>
+					<span class="info-value">{protocol.data.transport}</span>
+				</div>
+
+				<div>
+					<span class="info-label">CATEGORY</span>
+					<span class="info-value">{protocol.data.category}</span>
+				</div>
+			</div>
+
+			{protocol.data.tags.length > 0 && (
+				<div class="tags">
+					{protocol.data.tags.map((tag) => (
+						<span>{tag}</span>
+					))}
+				</div>
+			)}
+		</header>
+
+		<div class="article-layout">
+			<article class="article-content">
+				<Content />
+			</article>
+
+			{tocHeadings.length > 0 && (
+				<aside>
+					<TableOfContents headings={tocHeadings} />
+				</aside>
+			)}
+		</div>
+	</main>
+</Layout>
+
+<style>
+	main {
+	width: 100%;
+	max-width: 1320px;
+	margin: 0 auto;
+	padding: 0 2px;
+	}
+
+	.protocol-header {
+		padding: 20px 0 55px;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.breadcrumb {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 10px;
+		margin: 20px 0 42px;
+
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 11px;
+		letter-spacing: 0.08em;
+		color: var(--text-muted);
+	}
+
+	.breadcrumb a {
+		color: var(--accent);
+		text-decoration: none;
+	}
+
+	.breadcrumb a:hover {
+		text-decoration: underline;
+	}
+
+	.protocol-meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 9px;
+
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 10px;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--accent);
+	}
+
+	h1 {
+		max-width: 900px;
+		margin: 16px 0 20px;
+		font-size: clamp(48px, 6vw, 72px);
+		line-height: 1;
+		letter-spacing: -0.05em;
+	}
+
+	.description {
+		max-width: 800px;
+		margin: 0;
+		color: var(--text-muted);
+		font-size: 16px;
+		line-height: 1.8;
+	}
+
+	.protocol-information {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 45px;
+		margin-top: 35px;
+	}
+
+	.protocol-information > div {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	.info-label {
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 9px;
+		letter-spacing: 0.12em;
+		color: var(--text-muted);
+	}
+
+	.info-value {
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 12px;
+		color: var(--text);
+	}
+
+	.tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 7px;
+		margin-top: 30px;
+	}
+
+	.tags span {
+		padding: 5px 8px;
+		border: 1px solid var(--border);
+		border-radius: 4px;
+		background: var(--tag-background);
+
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 10px;
+		color: var(--text-muted);
+	}
+
+	.article-layout {
+	display: grid;
+	grid-template-columns: minmax(0, 900px) 240px;
+	justify-content: space-between;
+	gap: 60px;
+	padding: 65px 0 110px;
+}
+
+	.article-content {
+	min-width: 0;
+	width: 100%;
+	max-width: var(--article-content-width);
+}
+
+	aside {
+		min-width: 0;
+	}
+
+	.article-content :global(h2) {
+		margin: 60px 0 20px;
+		padding-bottom: 12px;
+		border-bottom: 1px solid var(--border);
+
+		font-size: 28px;
+		letter-spacing: -0.03em;
+	}
+
+	.article-content :global(h2:first-child) {
+		margin-top: 0;
+	}
+
+	.article-content :global(h3) {
+		margin: 40px 0 15px;
+		font-size: 21px;
+		letter-spacing: -0.02em;
+	}
+
+	.article-content :global(h4) {
+		margin: 30px 0 12px;
+		font-size: 17px;
+	}
+
+	.article-content :global(p),
+	.article-content :global(li) {
+		color: var(--text-muted);
+		font-size: 15px;
+		line-height: 1.8;
+	}
+
+	.article-content :global(p) {
+		margin: 0 0 20px;
+	}
+
+	.article-content :global(ul),
+	.article-content :global(ol) {
+		padding-left: 24px;
+		margin: 0 0 24px;
+	}
+
+	.article-content :global(li) {
+		margin-bottom: 7px;
+	}
+
+	.article-content :global(a) {
+		color: var(--accent);
+	}
+
+	.article-content :global(strong) {
+		color: var(--text);
+	}
+
+	.article-content :global(code) {
+		padding: 2px 5px;
+		border: 1px solid var(--border);
+		border-radius: 4px;
+		background: var(--code-background);
+
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 0.9em;
+	}
+
+	.article-content :global(pre) {
+		margin: 25px 0;
+		padding: 20px;
+		overflow-x: auto;
+
+		border: 1px solid var(--border);
+		border-radius: 7px;
+
+		background: var(--code-background);
+	}
+
+	.article-content :global(pre code) {
+		padding: 0;
+		border: 0;
+		background: transparent;
+	}
+
+	.article-content :global(blockquote) {
+		margin: 28px 0;
+		padding: 5px 0 5px 20px;
+
+		border-left: 3px solid var(--accent);
+		color: var(--text-muted);
+	}
+
+	.article-content :global(table) {
+		width: 100%;
+		margin: 28px 0;
+		border-collapse: collapse;
+		font-size: 13px;
+	}
+
+	.article-content :global(th),
+	.article-content :global(td) {
+		padding: 11px 13px;
+		border: 1px solid var(--border);
+		text-align: left;
+	}
+
+	.article-content :global(th) {
+		background: var(--surface);
+		color: var(--text);
+	}
+
+	.article-content :global(td) {
+		color: var(--text-muted);
+	}
+
+	.article-content :global(hr) {
+		margin: 50px 0;
+		border: 0;
+		border-top: 1px solid var(--border);
+	}
+
+	@media (max-width: 950px) {
+		.article-layout {
+			grid-template-columns: 1fr;
+			max-width: 850px;
+		}
+
+		.article-content {
+			max-width: 850px;
+		}
+
+		aside {
+			display: none;
+		}
+	}
+
+	@media (max-width: 650px) {
+		main {
+			padding: 0 18px;
+		}
+
+		.protocol-header {
+			padding-bottom: 40px;
+		}
+
+		.breadcrumb {
+			margin-bottom: 35px;
+		}
+
+		h1 {
+			font-size: 42px;
+		}
+
+		.protocol-information {
+			gap: 25px;
+		}
+
+		.article-layout {
+			padding: 45px 0 80px;
+		}
+	}
+</style>

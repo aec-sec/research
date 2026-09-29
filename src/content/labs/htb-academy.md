@@ -12,9 +12,10 @@ tags:
   - CVE-2018-15133
   - Credential Discovery
   - Linux
-  - Sudo
+  - Sudo abuse
 featured: true
 draft: false
+homepage: true
 ---
 
 ## Overview

@@ -3,18 +3,19 @@ import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 
 const labs = (await getCollection('labs'))
-	.filter((lab) => !lab.data.draft)
+	.filter((entry) => !entry.data.draft)
 	.sort(
 		(a, b) =>
-			b.data.published.getTime() -
-			a.data.published.getTime()
+			b.data.published.valueOf() - a.data.published.valueOf()
 	);
 
-const featuredLab = labs.find((lab) => lab.data.featured);
+const featuredLab = labs.find(
+	(lab) => lab.data.featured
+);
 
-const otherLabs = featuredLab
-	? labs.filter((lab) => lab.id !== featuredLab.id)
-	: labs;
+const archiveLabs = labs.filter(
+	(lab) => lab.id !== featuredLab?.id
+);
 ---
 
 <Layout
@@ -22,143 +23,169 @@ const otherLabs = featuredLab
 	description="Hands-on offensive security labs, vulnerable machines, Active Directory environments and exploitation walkthroughs."
 >
 	<main>
-		<section class="hero">
+		<section class="labs-hero">
 			<div class="breadcrumb">
-				<a href="/">AECSEC</a>
-				<span>/</span>
-				<span>LABS</span>
+				<span>~/</span>labs
 			</div>
-
-			<span class="eyebrow">HANDS-ON SECURITY</span>
 
 			<h1>Labs & Machines</h1>
 
-			<p class="hero-description">
+			<p>
 				Practical offensive security write-ups covering vulnerable machines,
 				Active Directory environments, web applications, exploitation and
 				privilege escalation.
 			</p>
 		</section>
 
-		{featuredLab && (
-			<section class="featured-section">
-				<div class="section-label">
-					<span>FEATURED LAB</span>
+		<section class="labs-content">
+			<div class="labs-header">
+				<div>
+					<span class="eyebrow">LAB ARCHIVE</span>
+					<h2>Published Labs</h2>
 				</div>
 
+				<div class="filters">
+					<button class="active">All</button>
+					<button>Web</button>
+					<button>Active Directory</button>
+					<button>Linux</button>
+					<button>Windows</button>
+					<button>Network</button>
+				</div>
+			</div>
+
+			{featuredLab && (
 				<a
 					class="featured"
 					href={`/labs/${featuredLab.id}`}
 				>
+					<div class="featured-label">
+						FEATURED LAB
+					</div>
+
 					<div class="featured-content">
-						<div class="meta">
-							<span>{featuredLab.data.platform}</span>
-							<span>/</span>
-							<span>{featuredLab.data.category}</span>
-							<span>/</span>
-							<span>{featuredLab.data.difficulty}</span>
-						</div>
+						<div>
+							<div class="meta">
+								<span>{featuredLab.data.platform.toUpperCase()}</span>
+								<span>•</span>
+								<span>{featuredLab.data.category.toUpperCase()}</span>
+								<span>•</span>
+								<span>{featuredLab.data.difficulty.toUpperCase()}</span>
+								<span>•</span>
+								<span>
+									{featuredLab.data.published.toLocaleDateString('en-GB')}
+								</span>
+							</div>
 
-						<h2>{featuredLab.data.title}</h2>
+							<h3>{featuredLab.data.title}</h3>
 
-						<p>{featuredLab.data.description}</p>
+							<p>{featuredLab.data.description}</p>
 
-						{featuredLab.data.tags.length > 0 && (
 							<div class="tags">
 								{featuredLab.data.tags.map((tag) => (
 									<span>{tag}</span>
 								))}
 							</div>
-						)}
-					</div>
+						</div>
 
-					<div class="featured-side">
-						<span class="os">{featuredLab.data.os}</span>
-						<span class="arrow">→</span>
+						<div class="featured-icon">
+							<span>LAB</span>
+						</div>
 					</div>
 				</a>
-			</section>
-		)}
+			)}
 
-		<section class="archive">
-			<div class="archive-header">
-				<div>
-					<span class="eyebrow">ARCHIVE</span>
-					<h2>Lab Write-ups</h2>
-				</div>
-
-				<span class="count">
-					{labs.length} {labs.length === 1 ? 'LAB' : 'LABS'}
-				</span>
-			</div>
-
-			<div class="filters">
-				<button class="active" type="button">All</button>
-				<button type="button">Web</button>
-				<button type="button">Active Directory</button>
-				<button type="button">Linux</button>
-				<button type="button">Windows</button>
-				<button type="button">Network</button>
-				<button type="button">Cloud</button>
-			</div>
-
-			{otherLabs.length > 0 ? (
+			{archiveLabs.length > 0 ? (
 				<div class="lab-list">
-					{otherLabs.map((lab) => (
+					{archiveLabs.map((lab) => (
 						<a
-							class="lab"
+							class="lab-item"
 							href={`/labs/${lab.id}`}
 						>
-							<div class="lab-date">
+							<div class="lab-meta">
+								<span>{lab.data.platform}</span>
+								<span>{lab.data.category}</span>
+								<span>{lab.data.difficulty}</span>
+								<span>{lab.data.os}</span>
 								<span>
-									{lab.data.published.toLocaleDateString('en-GB', {
-										day: '2-digit',
-										month: 'short',
-										year: 'numeric',
-									})}
+									{lab.data.published.toLocaleDateString('en-GB')}
 								</span>
 							</div>
 
-							<div class="lab-main">
-								<div class="meta">
-									<span>{lab.data.platform}</span>
-									<span>/</span>
-									<span>{lab.data.category}</span>
-									<span>/</span>
-									<span>{lab.data.difficulty}</span>
-								</div>
+							<h3>{lab.data.title}</h3>
 
-								<h3>{lab.data.title}</h3>
+							<p>{lab.data.description}</p>
 
-								<p>{lab.data.description}</p>
-
-								{lab.data.tags.length > 0 && (
-									<div class="tags">
-										{lab.data.tags.map((tag) => (
-											<span>{tag}</span>
-										))}
-									</div>
-								)}
+							<div class="tags">
+								{lab.data.tags.map((tag) => (
+									<span>{tag}</span>
+								))}
 							</div>
 
-							<div class="lab-side">
-								<span>{lab.data.os}</span>
-								<span class="arrow">→</span>
+							<div class="read-more">
+								Read write-up <span>→</span>
 							</div>
 						</a>
 					))}
 				</div>
 			) : (
 				<div class="empty-state">
-					<span class="empty-code">LAB_ARCHIVE_EMPTY</span>
+					<div class="empty-code">[ ]</div>
 
-					<h3>No additional labs published yet.</h3>
-
-					<p>
-						Lab write-ups will appear here as they are published.
-					</p>
+					<div>
+						<h3>No additional labs published yet.</h3>
+						<p>
+							New lab write-ups and offensive security walkthroughs
+							will appear here.
+						</p>
+					</div>
 				</div>
 			)}
+		</section>
+
+		<section class="methodology">
+			<div class="methodology-heading">
+				<span class="eyebrow">APPROACH</span>
+				<h2>Lab methodology</h2>
+			</div>
+
+			<div class="methodology-grid">
+				<div class="method">
+					<span>01</span>
+					<h3>Enumerate</h3>
+					<p>
+						Map the exposed attack surface, services, technologies
+						and potential entry points.
+					</p>
+				</div>
+
+				<div class="method">
+					<span>02</span>
+					<h3>Exploit</h3>
+					<p>
+						Identify weaknesses and develop a reliable path to
+						initial access.
+					</p>
+				</div>
+
+				<div class="method">
+					<span>03</span>
+					<h3>Escalate</h3>
+					<p>
+						Analyse the compromised environment and identify
+						privilege escalation opportunities.
+					</p>
+				</div>
+
+				<div class="method">
+					<span>04</span>
+					<h3>Document</h3>
+					<p>
+						Record the attack path, technical reasoning and
+						key lessons from the exercise.
+					</p>
+				</div>
+			</div>
 		</section>
 	</main>
 </Layout>
@@ -169,373 +196,366 @@ const otherLabs = featuredLab
 		margin: 0 auto;
 		padding: 0 32px;
 	}
-
-	.hero {
-		padding: 75px 0 70px;
-		border-bottom: 1px solid var(--border);
+	.labs-hero {
+		padding: 100px 0 85px;
+		max-width: 800px;
 	}
 
 	.breadcrumb {
-		display: flex;
-		align-items: center;
-		gap: 10px;
-		margin-bottom: 55px;
-
-		font-family:
-			"SFMono-Regular",
-			Consolas,
-			monospace;
-
-		font-size: 11px;
-		letter-spacing: 0.08em;
+		font-family: "SFMono-Regular", Consolas, monospace;
 		color: var(--text-muted);
+		font-size: 12px;
+		margin-bottom: 25px;
 	}
 
-	.breadcrumb a {
+	.breadcrumb span {
 		color: var(--accent);
-		text-decoration: none;
+	}
+
+	h1 {
+		font-size: clamp(48px, 6vw, 72px);
+		letter-spacing: -0.05em;
+		line-height: 1;
+		margin: 0;
+	}
+
+	.labs-hero > p {
+		max-width: 680px;
+		color: var(--text-muted);
+		font-size: 17px;
+		line-height: 1.8;
+		margin: 28px 0 0;
+	}
+
+	.labs-content {
+		border-top: 1px solid var(--border);
+		padding: 70px 0 100px;
+	}
+
+	.labs-header {
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 30px;
+		margin-bottom: 38px;
 	}
 
 	.eyebrow {
-		font-family:
-			"SFMono-Regular",
-			Consolas,
-			monospace;
-
+		font-family: "SFMono-Regular", Consolas, monospace;
 		font-size: 11px;
 		letter-spacing: 0.14em;
 		color: var(--accent);
 	}
 
-	h1 {
-		margin: 12px 0 22px;
-		font-size: clamp(48px, 6vw, 72px);
-		line-height: 1;
-		letter-spacing: -0.05em;
+	h2 {
+		font-size: 30px;
+		letter-spacing: -0.03em;
+		margin: 8px 0 0;
 	}
 
-	.hero-description {
-		max-width: 760px;
-		margin: 0;
+	.filters {
+		display: flex;
+		gap: 7px;
+		flex-wrap: wrap;
+	}
+
+	.filters button {
+		border: 1px solid var(--border);
+		background: var(--surface);
 		color: var(--text-muted);
-		font-size: 16px;
-		line-height: 1.8;
+		border-radius: 5px;
+		padding: 7px 11px;
+		font-size: 11px;
+		cursor: pointer;
 	}
 
-	.featured-section {
-		padding: 65px 0 80px;
-		border-bottom: 1px solid var(--border);
-	}
-
-	.section-label {
-		margin-bottom: 18px;
-
-		font-family:
-			"SFMono-Regular",
-			Consolas,
-			monospace;
-
-		font-size: 10px;
-		letter-spacing: 0.12em;
+	.filters button:hover,
+	.filters button.active {
 		color: var(--accent);
+		border-color: rgba(85, 214, 190, 0.35);
 	}
 
 	.featured {
-		display: flex;
-		justify-content: space-between;
-		gap: 50px;
-
-		padding: 38px;
 		border: 1px solid var(--border);
 		border-radius: 9px;
-		background: var(--surface);
-
+		background:
+			linear-gradient(
+				120deg,
+				rgba(85, 214, 190, 0.04),
+				transparent 45%
+			),
+			var(--surface);
+		overflow: hidden;
+		display: block;
 		color: inherit;
 		text-decoration: none;
-
-		transition:
-			transform 160ms ease,
-			border-color 160ms ease,
-			background 160ms ease;
 	}
 
 	.featured:hover {
-		transform: translateY(-3px);
-		border-color: var(--accent);
-		background: var(--surface-light);
+		border-color: rgba(85, 214, 190, 0.4);
+	}
+
+	.featured-label {
+		padding: 11px 20px;
+		border-bottom: 1px solid var(--border);
+		color: var(--accent);
+		font-family: "SFMono-Regular", Consolas, monospace;
+		font-size: 10px;
+		letter-spacing: 0.12em;
 	}
 
 	.featured-content {
-		max-width: 850px;
+		min-height: 270px;
+		padding: 35px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 50px;
 	}
 
 	.meta {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 8px;
-
-		font-family:
-			"SFMono-Regular",
-			Consolas,
-			monospace;
-
-		font-size: 10px;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
+		gap: 10px;
 		color: var(--text-muted);
+		font-family: "SFMono-Regular", Consolas, monospace;
+		font-size: 10px;
+		letter-spacing: 0.08em;
 	}
 
-	.featured h2 {
-		margin: 16px 0 12px;
-		font-size: 30px;
-		letter-spacing: -0.03em;
+	.featured h3 {
+		font-size: 28px;
+		letter-spacing: -0.025em;
+		margin: 16px 0 13px;
 	}
 
 	.featured p {
+		color: var(--text-muted);
+		line-height: 1.7;
+		font-size: 14px;
+		max-width: 650px;
 		margin: 0;
-		color: var(--text-muted);
-		line-height: 1.75;
 	}
 
-	.featured-side {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-		justify-content: space-between;
+	.featured-icon {
+		width: 130px;
+		height: 130px;
 		flex-shrink: 0;
-	}
-
-	.os {
-		padding: 6px 9px;
+		display: grid;
+		place-items: center;
 		border: 1px solid var(--border);
-		border-radius: 4px;
-
-		font-family:
-			"SFMono-Regular",
-			Consolas,
-			monospace;
-
-		font-size: 10px;
-		color: var(--text-muted);
-	}
-
-	.arrow {
-		font-size: 22px;
-		color: var(--text-muted);
-		transition: 150ms ease;
-	}
-
-	.featured:hover .arrow,
-	.lab:hover .arrow {
+		border-radius: 50%;
+		font-family: "SFMono-Regular", Consolas, monospace;
+		font-size: 20px;
 		color: var(--accent);
-		transform: translateX(3px);
+		background:
+			radial-gradient(
+				circle,
+				rgba(85, 214, 190, 0.09),
+				transparent 65%
+			);
 	}
 
 	.tags {
 		display: flex;
+		gap: 7px;
 		flex-wrap: wrap;
-		gap: 6px;
-		margin-top: 20px;
+		margin-top: 25px;
 	}
 
 	.tags span {
-		padding: 4px 7px;
+		padding: 5px 8px;
 		border: 1px solid var(--border);
 		border-radius: 4px;
 		background: var(--tag-background);
-
-		font-family:
-			"SFMono-Regular",
-			Consolas,
-			monospace;
-
-		font-size: 9px;
 		color: var(--text-muted);
-	}
-
-	.archive {
-		padding: 75px 0 110px;
-	}
-
-	.archive-header {
-		display: flex;
-		align-items: flex-end;
-		justify-content: space-between;
-		gap: 30px;
-		margin-bottom: 28px;
-	}
-
-	.archive-header h2 {
-		margin: 8px 0 0;
-		font-size: 32px;
-		letter-spacing: -0.03em;
-	}
-
-	.count {
-		font-family:
-			"SFMono-Regular",
-			Consolas,
-			monospace;
-
+		font-family: "SFMono-Regular", Consolas, monospace;
 		font-size: 10px;
-		letter-spacing: 0.1em;
-		color: var(--text-muted);
-	}
-
-	.filters {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 7px;
-		margin-bottom: 35px;
-	}
-
-	.filters button {
-		padding: 7px 10px;
-		border: 1px solid var(--border);
-		border-radius: 5px;
-		background: var(--surface);
-		color: var(--text-muted);
-		cursor: pointer;
-	}
-
-	.filters button.active {
-		border-color: var(--accent);
-		background: var(--accent-muted);
-		color: var(--accent);
 	}
 
 	.lab-list {
-		border-top: 1px solid var(--border);
-	}
-
-	.lab {
 		display: grid;
-		grid-template-columns: 125px minmax(0, 1fr) auto;
-		align-items: center;
-		gap: 35px;
-
-		padding: 28px 8px;
-		border-bottom: 1px solid var(--border);
-
-		color: inherit;
-		text-decoration: none;
-
-		transition:
-			padding 150ms ease,
-			background 150ms ease;
+		gap: 12px;
+		margin-top: 16px;
 	}
 
-	.lab:hover {
-		padding-left: 16px;
-		padding-right: 16px;
-		background: var(--surface);
-	}
-
-	.lab-date {
-		align-self: start;
-		padding-top: 3px;
-
-		font-family:
-			"SFMono-Regular",
-			Consolas,
-			monospace;
-
-		font-size: 10px;
-		color: var(--text-muted);
-	}
-
-	.lab h3 {
-		margin: 9px 0 7px;
-		font-size: 19px;
-	}
-
-	.lab p {
-		max-width: 800px;
-		margin: 0;
-		color: var(--text-muted);
-		font-size: 13px;
-		line-height: 1.65;
-	}
-
-	.lab-side {
-		display: flex;
-		align-items: center;
-		gap: 25px;
-
-		font-family:
-			"SFMono-Regular",
-			Consolas,
-			monospace;
-
-		font-size: 10px;
-		color: var(--text-muted);
-	}
-
-	.empty-state {
-		padding: 90px 30px;
-		border: 1px dashed var(--border);
+	.lab-item {
+		display: block;
+		padding: 26px 28px;
+		border: 1px solid var(--border);
 		border-radius: 8px;
 		background: var(--surface);
-		text-align: center;
+		color: inherit;
+		text-decoration: none;
+		transition:
+			border-color 0.2s ease,
+			transform 0.2s ease,
+			background 0.2s ease;
 	}
 
-	.empty-code {
-		font-family:
-			"SFMono-Regular",
-			Consolas,
-			monospace;
+	.lab-item:hover {
+		border-color: rgba(85, 214, 190, 0.4);
+		background: var(--surface-light);
+		transform: translateY(-2px);
+	}
 
+	.lab-meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+		margin-bottom: 12px;
+		font-family: "SFMono-Regular", Consolas, monospace;
 		font-size: 10px;
-		letter-spacing: 0.12em;
+		letter-spacing: 0.08em;
 		color: var(--accent);
 	}
 
+	.lab-item h3 {
+		margin: 0 0 9px;
+		font-size: 18px;
+	}
+
+	.lab-item p {
+		margin: 0;
+		max-width: 750px;
+		color: var(--text-muted);
+		font-size: 13px;
+		line-height: 1.7;
+	}
+
+	.read-more {
+		margin-top: 22px;
+		font-family: "SFMono-Regular", Consolas, monospace;
+		font-size: 11px;
+		color: var(--accent);
+	}
+
+	.read-more span {
+		display: inline-block;
+		margin-left: 5px;
+		transition: transform 0.2s ease;
+	}
+
+	.lab-item:hover .read-more span {
+		transform: translateX(4px);
+	}
+
+	.empty-state {
+		display: flex;
+		align-items: center;
+		gap: 20px;
+		margin-top: 16px;
+		padding: 25px 28px;
+		border: 1px dashed var(--border);
+		border-radius: 8px;
+	}
+
+	.empty-code {
+		color: var(--accent);
+		font-family: "SFMono-Regular", Consolas, monospace;
+		font-size: 17px;
+	}
+
 	.empty-state h3 {
-		margin: 14px 0 10px;
-		font-size: 21px;
+		margin: 0 0 6px;
+		font-size: 15px;
 	}
 
 	.empty-state p {
-		margin: 0;
 		color: var(--text-muted);
-		font-size: 14px;
+		margin: 0;
+		font-size: 13px;
+		line-height: 1.6;
 	}
 
-	@media (max-width: 800px) {
-		.lab {
-			grid-template-columns: 1fr;
-			gap: 12px;
-		}
+	.methodology {
+		border-top: 1px solid var(--border);
+		padding: 80px 0 30px;
+	}
 
-		.lab-side {
-			justify-content: space-between;
-		}
+	.methodology-heading {
+		margin-bottom: 35px;
+	}
 
-		.featured {
+	.methodology-grid {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		border: 1px solid var(--border);
+		border-radius: 9px;
+		overflow: hidden;
+	}
+
+	.method {
+		padding: 27px;
+		background: var(--surface);
+	}
+
+	.method + .method {
+		border-left: 1px solid var(--border);
+	}
+
+	.method > span {
+		font-family: "SFMono-Regular", Consolas, monospace;
+		font-size: 10px;
+		color: var(--accent);
+	}
+
+	.method h3 {
+		margin: 28px 0 9px;
+		font-size: 16px;
+	}
+
+	.method p {
+		color: var(--text-muted);
+		font-size: 12px;
+		line-height: 1.7;
+		margin: 0;
+	}
+
+	@media (max-width: 850px) {
+		.labs-header {
+			align-items: flex-start;
 			flex-direction: column;
 		}
 
-		.featured-side {
-			flex-direction: row;
-			align-items: center;
+		.methodology-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+
+		.method:nth-child(3) {
+			border-left: 0;
+			border-top: 1px solid var(--border);
+		}
+
+		.method:nth-child(4) {
+			border-top: 1px solid var(--border);
 		}
 	}
 
-	@media (max-width: 650px) {
+	@media (max-width: 600px) {
 		main {
 			padding: 0 18px;
 		}
 
-		.hero {
-			padding: 55px 0;
+		.labs-hero {
+			padding: 65px 0;
 		}
 
-		.breadcrumb {
-			margin-bottom: 40px;
+		.featured-content {
+			padding: 26px;
 		}
 
-		.archive {
-			padding-top: 60px;
+		.featured-icon {
+			display: none;
+		}
+
+		.methodology-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.method + .method {
+			border-left: 0;
+			border-top: 1px solid var(--border);
 		}
 	}
 </style>

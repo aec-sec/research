@@ -38,6 +38,7 @@ const research = defineCollection({
 		cve: z.string().optional(),
 
 		featured: z.boolean().default(false),
+        homepage: z.boolean().default(false),
 		draft: z.boolean().default(false),
 	}),
 });
@@ -134,6 +135,43 @@ const labs = defineCollection({
 		tags: z.array(z.string()).default([]),
 
 		featured: z.boolean().default(false),
+        homepage: z.boolean().default(false),
+		draft: z.boolean().default(false),
+	}),
+});
+
+const protocols = defineCollection({
+	loader: glob({
+		pattern: '**/*.{md,mdx}',
+		base: './src/content/protocols',
+	}),
+	schema: z.object({
+		title: z.string(),
+		description: z.string(),
+
+		port: z.string(),
+		transport: z.enum([
+			'TCP',
+			'UDP',
+			'TCP/UDP',
+			'Other',
+		]),
+
+		category: z.enum([
+			'Web',
+			'Remote Access',
+			'File Sharing',
+			'Email',
+			'Directory Services',
+			'Name Resolution',
+			'Network Management',
+			'Database',
+			'Infrastructure',
+			'Other',
+		]),
+
+		tags: z.array(z.string()).default([]),
+        homepage: z.boolean().default(false),
 		draft: z.boolean().default(false),
 	}),
 });
@@ -142,4 +180,5 @@ export const collections = {
 	research,
 	findings,
     labs,
+    protocols,
 };

@@ -1,5 +1,52 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const research = await getCollection('research');
+const labs = await getCollection('labs');
+const protocols = await getCollection('protocols');
+
+console.log(
+	'LABS:',
+	labs.map((item) => ({
+		id: item.id,
+		title: item.data.title,
+		homepage: item.data.homepage,
+		draft: item.data.draft,
+	}))
+);
+
+const homepageArticles = [
+	...research
+		.filter((item) => !item.data.draft && item.data.homepage)
+		.map((item) => ({
+			title: item.data.title,
+			description: item.data.description,
+			tags: item.data.tags,
+			type: 'Research',
+			url: `/research/${item.id}`,
+		})),
+
+	...labs
+		.filter((item) => !item.data.draft && item.data.homepage)
+		.map((item) => ({
+			title: item.data.title,
+			description: item.data.description,
+			tags: item.data.tags,
+			type: 'Lab',
+			url: `/labs/${item.id}`,
+		})),
+
+	...protocols
+		.filter((item) => !item.data.draft && item.data.homepage)
+		.map((item) => ({
+			title: item.data.title,
+			description: item.data.description,
+			tags: item.data.tags,
+			type: 'Protocol',
+			url: `/protocols/${item.id}`,
+		})),
+].slice(0, 3);
 ---
 
 <Layout
@@ -80,6 +127,44 @@ import Layout from '../layouts/Layout.astro';
 			</div>
 		</section>
 
+		<!-- FEATURED ARTICLES -->
+		{homepageArticles.length > 0 && (
+			<section class="section featured-section">
+				<div class="section-heading">
+					<div>
+						<span class="eyebrow">FEATURED</span>
+						<h2>Featured Articles</h2>
+					</div>
+				</div>
+
+				<div class="featured-grid">
+					{homepageArticles.map((article) => (
+						<a href={article.url} class="featured-card">
+							<div class="featured-card-top">
+								<span class="featured-type">
+									{article.type}
+								</span>
+
+								<span class="featured-arrow">↗</span>
+							</div>
+
+							<h3>{article.title}</h3>
+
+							<p>{article.description}</p>
+
+							{article.tags.length > 0 && (
+								<div class="tags">
+									{article.tags.slice(0, 3).map((tag) => (
+										<span>{tag}</span>
+									))}
+								</div>
+							)}
+						</a>
+					))}
+				</div>
+			</section>
+		)}
+
 		<!-- AREAS -->
 		<section class="section">
 			<div class="section-heading">
@@ -135,9 +220,29 @@ import Layout from '../layouts/Layout.astro';
 					</div>
 				</a>
 
-				<a href="/findings" class="card">
+				<a href="/protocols" class="card">
 					<div class="card-top">
 						<span class="card-number">03</span>
+						<span class="card-arrow">↗</span>
+	</div>
+
+	<h3>Protocols</h3>
+
+	<p>
+		Technical reference material covering network protocols,
+		services, enumeration and security considerations.
+	</p>
+
+	<div class="tags">
+		<span>HTTP</span>
+		<span>SMTP</span>
+		<span>DNS</span>
+	</div>
+</a>
+
+				<a href="/findings" class="card">
+					<div class="card-top">
+						<span class="card-number">04</span>
 						<span class="card-arrow">↗</span>
 					</div>
 
@@ -157,7 +262,7 @@ import Layout from '../layouts/Layout.astro';
 
 				<a href="/projects" class="card">
 					<div class="card-top">
-						<span class="card-number">04</span>
+						<span class="card-number">05</span>
 						<span class="card-arrow">↗</span>
 					</div>
 
@@ -480,6 +585,92 @@ import Layout from '../layouts/Layout.astro';
 		margin: 8px 0 0;
 	}
 
+	.featured-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 16px;
+	}
+
+	.featured-card {
+		display: flex;
+		flex-direction: column;
+		min-height: 280px;
+		padding: 28px;
+
+		border: 1px solid var(--border);
+		border-radius: 9px;
+
+		background:
+			linear-gradient(
+				145deg,
+				rgba(255, 255, 255, 0.018),
+				transparent
+			),
+			var(--surface);
+
+		text-decoration: none;
+
+		transition:
+			transform 160ms ease,
+			border-color 160ms ease,
+			background 160ms ease;
+	}
+
+	.featured-card:hover {
+		transform: translateY(-3px);
+		border-color: rgba(85, 214, 190, 0.35);
+		background: var(--surface-light);
+	}
+
+	.featured-card-top {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 38px;
+	}
+
+	.featured-type {
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 11px;
+		font-weight: 600;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--accent);
+	}
+
+	.featured-arrow {
+		color: var(--text-muted);
+		font-size: 20px;
+		transition: 160ms ease;
+	}
+
+	.featured-card:hover .featured-arrow {
+		color: var(--accent);
+		transform: translate(2px, -2px);
+	}
+
+	.featured-card h3 {
+		margin: 0 0 12px;
+		font-size: 21px;
+		line-height: 1.35;
+	}
+
+	.featured-card p {
+		margin: 0;
+		color: var(--text-muted);
+		font-size: 14px;
+		line-height: 1.7;
+	}
+
+	.featured-card .tags {
+		margin-top: auto;
+		padding-top: 24px;
+	}
+
 	.cards {
 		display: grid;
 		grid-template-columns: repeat(2, 1fr);
@@ -687,7 +878,11 @@ import Layout from '../layouts/Layout.astro';
 	}
 
 	@media (max-width: 900px) {
+		.featured-grid {
+			grid-template-columns: 1fr;
+		}
 		.hero {
+			
 			grid-template-columns: 1fr;
 			gap: 40px;
 			padding: 70px 0;
