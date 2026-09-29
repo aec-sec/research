@@ -1,6 +1,6 @@
 ---
 title: "Bounty Hunter"
-description: "A practical Hack The Box lab covering web application enumeration, Laravel APP_KEY exploitation via CVE-2018-15133, credential discovery, privilege escalation, and full Linux host compromise."
+description: "Hack The Box walkthrough covering XXE exploitation, PHP wrappers, credential reuse, eval() injection and Linux privilege escalation."
 published: 2026-09-29
 platform: "Hack The Box"
 category: "Linux"

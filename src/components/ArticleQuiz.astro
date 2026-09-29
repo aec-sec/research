@@ -1,0 +1,530 @@
+---
+interface Question {
+	question: string;
+	answers: string[];
+	correct: number;
+	explanation?: string;
+}
+
+interface Props {
+	questions: Question[];
+	articleId: string;
+}
+
+const { questions, articleId } = Astro.props;
+---
+
+<div
+	class="article-quiz"
+	data-quiz
+	data-article-id={articleId}
+>
+	<div class="quiz-header">
+		<div>
+			<span class="quiz-label">KNOWLEDGE CHECK</span>
+			<h2>Test your understanding</h2>
+		</div>
+
+		<span class="quiz-progress" data-progress>
+			1 / {questions.length}
+		</span>
+	</div>
+
+	<div class="quiz-body">
+		{questions.map((question, questionIndex) => (
+			<div
+				class="quiz-question"
+				data-question
+				data-index={questionIndex}
+				data-correct={question.correct}
+				data-explanation={question.explanation ?? ''}
+				hidden={questionIndex !== 0}
+			>
+				<p class="question-number">
+					QUESTION {questionIndex + 1}
+				</p>
+
+				<h3>{question.question}</h3>
+
+				<div class="answers">
+					{question.answers.map((answer, answerIndex) => (
+						<button
+							type="button"
+							class="answer"
+							data-answer
+							data-answer-index={answerIndex}
+						>
+							<span class="answer-marker">
+								{String.fromCharCode(65 + answerIndex)}
+							</span>
+
+							<span>{answer}</span>
+						</button>
+					))}
+				</div>
+
+				<div class="feedback" data-feedback hidden>
+					<p class="feedback-result" data-feedback-result></p>
+					<p class="feedback-explanation" data-feedback-explanation></p>
+				</div>
+
+				<div class="quiz-actions">
+					<button
+						type="button"
+						class="next-button"
+						data-next
+						hidden
+					>
+						{questionIndex === questions.length - 1
+							? 'View Results'
+							: 'Next Question →'}
+					</button>
+				</div>
+			</div>
+		))}
+
+		<div class="quiz-results" data-results hidden>
+			<span class="quiz-label">KNOWLEDGE CHECK COMPLETE</span>
+
+			<h3>Your score</h3>
+
+			<div class="score">
+				<span data-score>0</span>
+				<span class="score-total"> / {questions.length}</span>
+			</div>
+
+			<div class="score-bar">
+				<div class="score-fill" data-score-fill></div>
+			</div>
+
+			<p class="score-percentage" data-percentage></p>
+
+			<button type="button" class="retake-button" data-retake>
+				Retake Quiz
+			</button>
+		</div>
+	</div>
+</div>
+
+<script>
+	const quizzes = document.querySelectorAll('[data-quiz]');
+
+	quizzes.forEach((quiz) => {
+		const questions = Array.from(
+			quiz.querySelectorAll('[data-question]')
+		);
+
+		const progress = quiz.querySelector('[data-progress]');
+		const results = quiz.querySelector('[data-results]');
+		const scoreElement = quiz.querySelector('[data-score]');
+		const percentageElement = quiz.querySelector('[data-percentage]');
+		const scoreFill = quiz.querySelector('[data-score-fill]');
+		const retakeButton = quiz.querySelector('[data-retake]');
+
+		let currentQuestion = 0;
+		let score = 0;
+
+		function showQuestion(index) {
+			questions.forEach((question, questionIndex) => {
+				question.hidden = questionIndex !== index;
+			});
+
+			currentQuestion = index;
+
+			if (progress) {
+				progress.textContent = `${index + 1} / ${questions.length}`;
+			}
+		}
+
+		questions.forEach((question, questionIndex) => {
+			const answers = question.querySelectorAll('[data-answer]');
+			const nextButton = question.querySelector('[data-next]');
+			const feedback = question.querySelector('[data-feedback]');
+			const feedbackResult = question.querySelector(
+				'[data-feedback-result]'
+			);
+			const feedbackExplanation = question.querySelector(
+				'[data-feedback-explanation]'
+			);
+
+			const correctAnswer = Number(
+				question.getAttribute('data-correct')
+			);
+
+			const explanation =
+				question.getAttribute('data-explanation') ?? '';
+
+			answers.forEach((answer) => {
+				answer.addEventListener('click', () => {
+					if (question.getAttribute('data-answered') === 'true') {
+						return;
+					}
+
+					question.setAttribute('data-answered', 'true');
+
+					const selectedAnswer = Number(
+						answer.getAttribute('data-answer-index')
+					);
+
+					const isCorrect = selectedAnswer === correctAnswer;
+
+					if (isCorrect) {
+						score++;
+						answer.classList.add('correct');
+
+						if (feedbackResult) {
+							feedbackResult.textContent = 'Correct';
+							feedbackResult.classList.add('correct-text');
+						}
+					} else {
+						answer.classList.add('incorrect');
+
+						if (feedbackResult) {
+							feedbackResult.textContent = 'Incorrect';
+							feedbackResult.classList.add('incorrect-text');
+						}
+
+						answers.forEach((possibleAnswer) => {
+							if (
+								Number(
+									possibleAnswer.getAttribute(
+										'data-answer-index'
+									)
+								) === correctAnswer
+							) {
+								possibleAnswer.classList.add('correct');
+							}
+						});
+					}
+
+					answers.forEach((button) => {
+						button.setAttribute('disabled', '');
+					});
+
+					if (feedbackExplanation && explanation) {
+						feedbackExplanation.textContent = explanation;
+					}
+
+					if (feedback) {
+						feedback.hidden = false;
+					}
+
+					if (nextButton) {
+						nextButton.hidden = false;
+					}
+				});
+			});
+
+			nextButton?.addEventListener('click', () => {
+				if (questionIndex < questions.length - 1) {
+					showQuestion(questionIndex + 1);
+					return;
+				}
+
+				questions.forEach((item) => {
+					item.hidden = true;
+				});
+
+				if (progress) {
+					progress.textContent = 'COMPLETE';
+				}
+
+				const percentage = Math.round(
+					(score / questions.length) * 100
+				);
+
+				if (scoreElement) {
+					scoreElement.textContent = String(score);
+				}
+
+				if (percentageElement) {
+					percentageElement.textContent = `${percentage}%`;
+				}
+
+				if (scoreFill instanceof HTMLElement) {
+					scoreFill.style.width = `${percentage}%`;
+				}
+
+				if (results) {
+					results.hidden = false;
+				}
+
+				const articleId =
+					quiz.getAttribute('data-article-id') ?? 'article';
+
+				localStorage.setItem(
+					`quiz-${articleId}`,
+					JSON.stringify({
+						score,
+						total: questions.length,
+						percentage
+					})
+				);
+			});
+		});
+
+		retakeButton?.addEventListener('click', () => {
+			score = 0;
+
+			if (results) {
+				results.hidden = true;
+			}
+
+			questions.forEach((question) => {
+				question.removeAttribute('data-answered');
+
+				const answers =
+					question.querySelectorAll('[data-answer]');
+
+				answers.forEach((answer) => {
+					answer.removeAttribute('disabled');
+					answer.classList.remove('correct', 'incorrect');
+				});
+
+				const feedback =
+					question.querySelector('[data-feedback]');
+
+				const next =
+					question.querySelector('[data-next]');
+
+				const feedbackResult =
+					question.querySelector('[data-feedback-result]');
+
+				if (feedback) {
+					feedback.hidden = true;
+				}
+
+				if (next) {
+					next.hidden = true;
+				}
+
+				if (feedbackResult) {
+					feedbackResult.classList.remove(
+						'correct-text',
+						'incorrect-text'
+					);
+				}
+			});
+
+			showQuestion(0);
+		});
+
+		showQuestion(0);
+	});
+</script>
+
+<style>
+	.article-quiz {
+		margin-top: 70px;
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		background: var(--surface);
+		overflow: hidden;
+	}
+
+	.quiz-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		gap: 30px;
+		padding: 22px 25px;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.quiz-label {
+		color: var(--accent);
+		font-family: "SFMono-Regular", Consolas, monospace;
+		font-size: 10px;
+		letter-spacing: 0.12em;
+	}
+
+	.quiz-header h2 {
+		margin: 7px 0 0;
+		font-size: 20px;
+	}
+
+	.quiz-progress {
+		color: var(--text-muted);
+		font-family: "SFMono-Regular", Consolas, monospace;
+		font-size: 11px;
+	}
+
+	.quiz-body {
+		padding: 28px 25px;
+	}
+
+	.question-number {
+		margin: 0 0 10px;
+		color: var(--accent);
+		font-family: "SFMono-Regular", Consolas, monospace;
+		font-size: 10px;
+		letter-spacing: 0.1em;
+	}
+
+	.quiz-question h3 {
+		margin: 0 0 24px;
+		font-size: 18px;
+		line-height: 1.5;
+	}
+
+	.answers {
+		display: grid;
+		gap: 10px;
+	}
+
+	.answer {
+		display: flex;
+		align-items: center;
+		gap: 14px;
+		width: 100%;
+		padding: 13px 15px;
+		border: 1px solid var(--border);
+		border-radius: 5px;
+		background: transparent;
+		color: var(--text);
+		text-align: left;
+		cursor: pointer;
+		transition:
+			border-color 0.15s ease,
+			background 0.15s ease;
+	}
+
+	.answer:hover:not(:disabled) {
+		border-color: var(--accent);
+	}
+
+	.answer-marker {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 27px;
+		height: 27px;
+		flex-shrink: 0;
+		border: 1px solid var(--border);
+		border-radius: 4px;
+		font-family: "SFMono-Regular", Consolas, monospace;
+		font-size: 10px;
+	}
+
+	.answer.correct {
+		border-color: #42b883;
+	}
+
+	.answer.incorrect {
+		border-color: #d75c5c;
+	}
+
+	.feedback {
+		margin-top: 20px;
+		padding: 15px;
+		border-left: 2px solid var(--accent);
+		background: var(--code-background);
+	}
+
+	.feedback-result {
+		margin: 0 0 7px;
+		font-weight: 600;
+	}
+
+	.feedback-explanation {
+		margin: 0;
+		color: var(--text-muted);
+		font-size: 14px;
+		line-height: 1.7;
+	}
+
+	.correct-text {
+		color: #42b883;
+	}
+
+	.incorrect-text {
+		color: #d75c5c;
+	}
+
+	.quiz-actions {
+		display: flex;
+		justify-content: flex-end;
+		margin-top: 20px;
+	}
+
+	.next-button,
+	.retake-button {
+		padding: 10px 14px;
+		border: 1px solid var(--accent);
+		border-radius: 4px;
+		background: transparent;
+		color: var(--accent);
+		font-family: "SFMono-Regular", Consolas, monospace;
+		font-size: 11px;
+		cursor: pointer;
+	}
+
+	.next-button:hover,
+	.retake-button:hover {
+		background: var(--accent);
+		color: var(--background);
+	}
+
+	.quiz-results {
+		text-align: center;
+		padding: 20px 0;
+	}
+
+	.quiz-results h3 {
+		margin: 10px 0 15px;
+	}
+
+	.score {
+		font-family: "SFMono-Regular", Consolas, monospace;
+		font-size: 38px;
+	}
+
+	.score-total {
+		color: var(--text-muted);
+	}
+
+	.score-bar {
+		max-width: 350px;
+		height: 5px;
+		margin: 20px auto 10px;
+		background: var(--border);
+		overflow: hidden;
+	}
+
+	.score-fill {
+		width: 0;
+		height: 100%;
+		background: var(--accent);
+		transition: width 0.4s ease;
+	}
+
+	.score-percentage {
+		color: var(--text-muted);
+		font-family: "SFMono-Regular", Consolas, monospace;
+		font-size: 12px;
+	}
+
+	.retake-button {
+		margin-top: 15px;
+	}
+
+	[hidden] {
+		display: none !important;
+	}
+
+	@media (max-width: 600px) {
+		.quiz-header,
+		.quiz-body {
+			padding-left: 18px;
+			padding-right: 18px;
+		}
+
+		.quiz-header {
+			gap: 15px;
+		}
+
+		.answer {
+			padding: 12px;
+		}
+	}
+</style>

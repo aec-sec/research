@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
 import { getCollection, render } from 'astro:content';
+import ArticleQuiz from '../../components/ArticleQuiz.astro';
 
 export async function getStaticPaths() {
 	const research = await getCollection('research', ({ data }) => {
@@ -84,8 +85,15 @@ const readingTime = Math.max(1, Math.ceil(words / 200));
 
 			<div class="article-body">
 	<div class="article-content">
-		<Content />
-	</div>
+	<Content />
+
+	{article.data.quiz && (
+		<ArticleQuiz
+			questions={article.data.quiz}
+			articleId={article.id}
+		/>
+	)}
+</div>
 
 	{tocHeadings.length > 0 && (
 		<TableOfContents headings={tocHeadings} />
@@ -208,6 +216,14 @@ const readingTime = Math.max(1, Math.ceil(words / 200));
 		color: var(--text-muted);
 		margin: 6px 0;
 	}
+    
+    .article-content :global(th) {
+	    text-align: left;
+    }
+
+    .article-content :global(td) {
+	padding-right: 40px;
+}
 
 	.article-content :global(a) {
 		color: var(--accent);

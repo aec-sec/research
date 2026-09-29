@@ -7,8 +7,9 @@ tags:
   - Testing
   - Markdown
   - Documentation
-featured: true
+featured: false
 draft: false
+homepage: false
 ---
 
 # Markdown Rendering Test

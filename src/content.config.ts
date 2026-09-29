@@ -1,6 +1,15 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
+const quizSchema = z.array(
+	z.object({
+		question: z.string(),
+		answers: z.array(z.string()).length(4),
+		correct: z.number().int().min(0).max(3),
+		explanation: z.string().optional(),
+	})
+).min(1).max(20).optional();
+
 const research = defineCollection({
 	loader: glob({
 		pattern: '**/*.{md,mdx}',
@@ -40,6 +49,7 @@ const research = defineCollection({
 		featured: z.boolean().default(false),
         homepage: z.boolean().default(false),
 		draft: z.boolean().default(false),
+        quiz: quizSchema,
 	}),
 });
 
@@ -137,6 +147,7 @@ const labs = defineCollection({
 		featured: z.boolean().default(false),
         homepage: z.boolean().default(false),
 		draft: z.boolean().default(false),
+        quiz: quizSchema,
 	}),
 });
 
