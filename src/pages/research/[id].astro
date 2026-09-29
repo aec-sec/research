@@ -1,0 +1,295 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+	const research = await getCollection('research', ({ data }) => {
+		return !data.draft;
+	});
+
+	return research.map((article) => ({
+		params: { id: article.id },
+		props: { article },
+	}));
+}
+
+const { article } = Astro.props;
+const { Content, headings } = await render(article);
+
+const tocHeadings = headings.filter(
+	(heading) => heading.depth >= 2 && heading.depth <= 3
+);
+
+const words = article.body
+	.trim()
+	.split(/\s+/)
+	.filter(Boolean)
+	.length;
+
+const readingTime = Math.max(1, Math.ceil(words / 200));
+---
+
+<Layout
+	title={`${article.data.title} | AEC Security`}
+	description={article.data.description}
+>
+	<main>
+		<article class="article">
+			<a class="back" href="/research">← Research</a>
+
+			<header class="article-header">
+				<div class="meta">
+	<span>{article.data.category}</span>
+	<span>/</span>
+
+	<time datetime={article.data.published.toISOString()}>
+		{article.data.published.toLocaleDateString('en-GB', {
+			day: '2-digit',
+			month: 'long',
+			year: 'numeric',
+		})}
+	</time>
+
+	<span>/</span>
+	<span>{readingTime} MIN READ</span>
+</div>
+
+				<h1>{article.data.title}</h1>
+
+				<p class="description">{article.data.description}</p>
+                {(article.data.cve || article.data.severity) && (
+	<div class="security-meta">
+		{article.data.cve && (
+			<div>
+				<span class="security-label">CVE</span>
+				<span class="security-value">{article.data.cve}</span>
+			</div>
+		)}
+
+		{article.data.severity && (
+			<div>
+				<span class="security-label">SEVERITY</span>
+				<span class="security-value">{article.data.severity}</span>
+			</div>
+		)}
+	</div>
+)}
+				<div class="tags">
+					{article.data.tags.map((tag) => (
+						<span>{tag}</span>
+					))}
+				</div>
+			</header>
+
+			<div class="article-body">
+	<div class="article-content">
+		<Content />
+	</div>
+
+	{tocHeadings.length > 0 && (
+		<TableOfContents headings={tocHeadings} />
+	)}
+</div>
+		</article>
+	</main>
+</Layout>
+
+<style>
+	main {
+		max-width: 1440px;
+		margin: 0 auto;
+		padding: 0 24px;
+	}
+
+	.article {
+		max-width: 1320px;
+		margin: 0 auto;
+		padding: 70px 0 120px;
+	}
+
+	.back {
+		display: inline-block;
+		margin-bottom: 50px;
+		color: var(--text-muted);
+		font-family: "SFMono-Regular", Consolas, monospace;
+		font-size: 12px;
+		text-decoration: none;
+	}
+
+	.back:hover {
+		color: var(--accent);
+	}
+
+	.article-header {
+		padding-bottom: 45px;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.meta {
+		display: flex;
+		gap: 10px;
+		margin-bottom: 20px;
+		color: var(--accent);
+		font-family: "SFMono-Regular", Consolas, monospace;
+		font-size: 11px;
+		letter-spacing: 0.06em;
+	}
+
+	h1 {
+		margin: 0;
+		font-size: clamp(38px, 6vw, 60px);
+		line-height: 1.05;
+		letter-spacing: -0.045em;
+	}
+
+	.description {
+		margin: 24px 0 0;
+		max-width: 700px;
+		color: var(--text-muted);
+		font-size: 16px;
+		line-height: 1.8;
+	}
+
+	.tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 7px;
+		margin-top: 25px;
+	}
+
+	.tags span {
+		padding: 5px 8px;
+		border: 1px solid var(--border);
+		border-radius: 4px;
+		background: var(--tag-background);
+        color: var(--text-muted);
+		font-family: "SFMono-Regular", Consolas, monospace;
+		font-size: 10px;
+	}
+
+	.article-content {
+		padding-top: 45px;
+		color: var(--text);
+		font-size: 15px;
+		line-height: 1.85;
+	}
+
+	.article-content :global(h1),
+	.article-content :global(h2),
+	.article-content :global(h3) {
+		letter-spacing: -0.025em;
+		line-height: 1.3;
+	}
+
+	.article-content :global(h1) {
+		font-size: 32px;
+		margin: 0 0 25px;
+	}
+
+	.article-content :global(h2) {
+		font-size: 24px;
+		margin: 50px 0 18px;
+		padding-bottom: 10px;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.article-content :global(h3) {
+		font-size: 18px;
+		margin: 35px 0 15px;
+	}
+
+.article-content :global(p) {
+	    color: var(--text-muted);
+		margin: 0 0 20px;
+	}
+
+	.article-content :global(li) {
+		color: var(--text-muted);
+		margin: 6px 0;
+	}
+
+	.article-content :global(a) {
+		color: var(--accent);
+	}
+
+	.article-content :global(code) {
+		font-family: "SFMono-Regular", Consolas, monospace;
+		font-size: 0.9em;
+	}
+
+	.article-content :global(:not(pre) > code) {
+		padding: 2px 6px;
+		border: 1px solid var(--border);
+		border-radius: 4px;
+		background: var(--surface);
+		color: var(--accent);
+	}
+
+	.article-content :global(pre) {
+		margin: 25px 0;
+		padding: 20px;
+		overflow-x: auto;
+		border: 1px solid var(--border);
+		border-radius: 7px;
+		background: var(--code-background);
+	}
+
+	.article-content {
+	min-width: 0;
+	color: var(--text);
+	font-size: 15px;
+	line-height: 1.85;
+}
+
+	@media (max-width: 600px) {
+		main {
+			padding: 0 18px;
+		}
+
+		.article {
+			padding-top: 45px;
+		}
+	}
+    .security-meta {
+	display: flex;
+	gap: 30px;
+	margin-top: 28px;
+	padding: 16px 0;
+	border-top: 1px solid var(--border);
+	border-bottom: 1px solid var(--border);
+}
+
+.security-meta > div {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+
+.security-label {
+	font-family: "SFMono-Regular", Consolas, monospace;
+	font-size: 9px;
+	letter-spacing: 0.12em;
+	color: var(--text-muted);
+}
+
+.security-value {
+	font-family: "SFMono-Regular", Consolas, monospace;
+	font-size: 12px;
+	color: var(--accent);
+}
+
+.article-body {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 240px;
+	gap: 90px;
+	align-items: start;
+	padding-top: 45px;
+}
+
+@media (max-width: 950px) {
+	.article-body {
+		display: block;
+	}
+}
+</style>

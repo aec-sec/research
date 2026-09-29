@@ -1,0 +1,135 @@
+---
+interface Heading {
+	depth: number;
+	slug: string;
+	text: string;
+}
+
+interface Props {
+	headings: Heading[];
+	title?: string;
+}
+
+const {
+	headings,
+	title = 'On this page'
+} = Astro.props;
+---
+
+<aside class="toc">
+	<div class="toc-inner">
+		<div class="toc-title">
+			<span>//</span>
+			{title}
+		</div>
+
+		<nav aria-label="Table of contents">
+			<ul>
+				{headings.map((heading) => (
+					<li class={`depth-${heading.depth}`}>
+						<a href={`#${heading.slug}`}>
+							{heading.text}
+						</a>
+					</li>
+				))}
+			</ul>
+		</nav>
+
+		<a class="back-to-top" href="#">
+			<span>↑</span>
+			Back to top
+		</a>
+	</div>
+</aside>
+
+<style>
+	.toc {
+		width: 240px;
+		flex-shrink: 0;
+	}
+
+	.toc-inner {
+		position: sticky;
+		top: 100px;
+	}
+
+	.toc-title {
+		display: flex;
+		gap: 8px;
+		margin-bottom: 16px;
+
+		font-family: "SFMono-Regular", Consolas, monospace;
+		font-size: 10px;
+		font-weight: 600;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--text-muted);
+	}
+
+	.toc-title span {
+		color: var(--accent);
+	}
+
+	nav {
+		padding-left: 14px;
+		border-left: 1px solid var(--border);
+	}
+
+	ul {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	li {
+		margin: 0;
+	}
+
+	a {
+		display: block;
+		padding: 6px 0;
+
+		color: #778391;
+		font-size: 11px;
+		line-height: 1.45;
+		text-decoration: none;
+
+		transition: color 0.15s ease;
+	}
+
+	a:hover {
+		color: var(--accent);
+	}
+
+	.depth-3 {
+		padding-left: 12px;
+	}
+
+	.depth-4 {
+		padding-left: 24px;
+	}
+
+	.back-to-top {
+		display: flex;
+		align-items: center;
+		gap: 7px;
+
+		margin-top: 22px;
+		padding-top: 15px;
+		border-top: 1px solid var(--border);
+
+		font-family: "SFMono-Regular", Consolas, monospace;
+		font-size: 10px;
+		color: var(--text-muted);
+	}
+
+	.back-to-top span {
+		color: var(--accent);
+	}
+
+	@media (max-width: 950px) {
+		.toc {
+			display: none;
+		}
+	}
+</style>

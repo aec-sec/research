@@ -1,23 +1,553 @@
+---
+interface Props {
+	title?: string;
+	description?: string;
+}
+
+const {
+	title = 'AEC Security',
+	description = 'Cybersecurity research, penetration testing, red teaming and technical write-ups.',
+} = Astro.props;
+---
+
 <!doctype html>
 <html lang="en">
 	<head>
+	<script is:inline>
+	(() => {
+		try {
+			const savedTheme = localStorage.getItem('aec-theme');
+
+			if (savedTheme) {
+				document.documentElement.setAttribute(
+					'data-theme',
+					savedTheme
+				);
+			}
+		} catch {
+			// Fall back to the default theme.
+		}
+	})();
+</script>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+		<meta name="description" content={description} />
+		<meta name="generator" content={Astro.generator} />
+
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
-		<meta name="generator" content={Astro.generator} />
-		<title>aec-sec</title>
+
+		<title>{title}</title>
 	</head>
+
 	<body>
-		<slot />
+		<header class="site-header">
+			<nav class="nav-container">
+				<a class="brand" href="/">
+					<span class="brand-prompt">&gt;_</span>
+					<span class="brand-aec">AEC</span><span class="brand-sec">SEC</span>
+				</a>
+
+				<div class="nav-links">
+					<a href="/research">Research</a>
+					<a href="/labs">Labs</a>
+					<a href="/notes">Notes</a>
+					<a href="/projects">Projects</a>
+					<a href="/about">About</a>
+				</div>
+				<div class="theme-picker">
+	<button
+		id="theme-button"
+		class="theme-button"
+		type="button"
+		aria-label="Change colour theme"
+		aria-expanded="false"
+	>
+		<span class="theme-icon">◐</span>
+		<span class="theme-name">Theme</span>
+		<span class="theme-arrow">⌄</span>
+	</button>
+
+	<div id="theme-menu" class="theme-menu" hidden>
+		<button type="button" data-theme-option="dark">
+			<span class="theme-dot dark-dot"></span>
+			Dark
+		</button>
+
+		<button type="button" data-theme-option="midnight">
+			<span class="theme-dot midnight-dot"></span>
+			Midnight
+		</button>
+
+		<button type="button" data-theme-option="light">
+			<span class="theme-dot light-dot"></span>
+			Light
+		</button>
+
+		<button type="button" data-theme-option="terminal">
+			<span class="theme-dot terminal-dot"></span>
+			Terminal
+		</button>
+
+		<button type="button" data-theme-option="nord">
+			<span class="theme-dot nord-dot"></span>
+			Nord
+		</button>
+	</div>
+</div>
+			</nav>
+		</header>
+
+		<div class="page">
+			<slot />
+		</div>
+
+		<footer>
+			<div class="footer-container">
+				<span>AEC Security</span>
+				<span>Security research & technical documentation</span>
+			</div>
+		</footer>
 	</body>
+	<script is:inline>
+	const themeButton = document.getElementById('theme-button');
+	const themeMenu = document.getElementById('theme-menu');
+	const themeName = document.querySelector('.theme-name');
+	const themeOptions = document.querySelectorAll('[data-theme-option]');
+
+	const themeLabels = {
+		dark: 'Dark',
+		midnight: 'Midnight',
+		light: 'Light',
+		terminal: 'Terminal',
+		nord: 'Nord'
+	};
+	const savedTheme = localStorage.getItem('aec-theme');
+
+if (savedTheme && themeLabels[savedTheme]) {
+	document.documentElement.setAttribute('data-theme', savedTheme);
+
+	if (themeName) {
+		themeName.textContent = themeLabels[savedTheme];
+	}
+}
+
+	// Open/close the theme menu
+	themeButton?.addEventListener('click', (event) => {
+		event.stopPropagation();
+
+		const isOpen = !themeMenu?.hasAttribute('hidden');
+
+		if (isOpen) {
+			themeMenu?.setAttribute('hidden', '');
+			themeButton.setAttribute('aria-expanded', 'false');
+		} else {
+			themeMenu?.removeAttribute('hidden');
+			themeButton.setAttribute('aria-expanded', 'true');
+		}
+	});
+
+	// Change theme
+	themeOptions.forEach((option) => {
+		option.addEventListener('click', () => {
+			const theme = option.getAttribute('data-theme-option');
+
+			if (!theme) return;
+
+			document.documentElement.setAttribute('data-theme', theme);
+			localStorage.setItem('aec-theme', theme);
+			if (themeName) {
+				themeName.textContent = themeLabels[theme] ?? 'Theme';
+			}
+			
+
+			themeMenu?.setAttribute('hidden', '');
+			themeButton?.setAttribute('aria-expanded', 'false');
+		});
+	});
+
+	// Close menu when clicking elsewhere
+	document.addEventListener('click', (event) => {
+		if (
+			themeMenu &&
+			themeButton &&
+			event.target instanceof Node &&
+			!themeMenu.contains(event.target) &&
+			!themeButton.contains(event.target)
+		) {
+			themeMenu.setAttribute('hidden', '');
+			themeButton.setAttribute('aria-expanded', 'false');
+		}
+	});
+
+	// Close menu with Escape
+	document.addEventListener('keydown', (event) => {
+		if (event.key === 'Escape') {
+			themeMenu?.setAttribute('hidden', '');
+			themeButton?.setAttribute('aria-expanded', 'false');
+		}
+	});
+</script>
 </html>
 
-<style>
-	html,
+<style is:global>
+	/* Default — Dark */
+:root,
+[data-theme="dark"] {
+	--background: #090d12;
+	--surface: #0e141b;
+	--surface-light: #141c25;
+	--border: #202a35;
+
+	--text: #e6edf3;
+	--text-muted: #8995a3;
+
+	--accent: #55d6be;
+	--accent-muted: #183d3a;
+
+	--code-background: #070b0f;
+	--tag-background: #090e13;
+
+	--content-width: 1180px;
+
+	color-scheme: dark;
+}
+
+/* Midnight */
+[data-theme="midnight"] {
+	--background: #050814;
+	--surface: #090e1d;
+	--surface-light: #10182a;
+	--border: #1d2940;
+
+	--text: #e6edf7;
+	--text-muted: #8190a8;
+
+	--accent: #6ea8fe;
+	--accent-muted: #172d4d;
+
+	--code-background: #030610;
+	--tag-background: #080d19;
+
+	color-scheme: dark;
+}
+
+/* Light */
+[data-theme="light"] {
+	--background: #f6f8fa;
+	--surface: #ffffff;
+	--surface-light: #eef1f4;
+	--border: #d8dee4;
+
+	--text: #1f2328;
+	--text-muted: #656d76;
+
+	--accent: #087f6d;
+	--accent-muted: #d9f2ed;
+
+	--code-background: #f0f3f6;
+	--tag-background: #eef1f4;
+
+	color-scheme: light;
+}
+
+/* Terminal */
+[data-theme="terminal"] {
+	--background: #050805;
+	--surface: #080d08;
+	--surface-light: #0d150d;
+	--border: #1b321d;
+
+	--text: #d4f7d4;
+	--text-muted: #719471;
+
+	--accent: #5cff72;
+	--accent-muted: #153b1b;
+
+	--code-background: #020502;
+	--tag-background: #071007;
+
+	color-scheme: dark;
+}
+
+/* Nord */
+[data-theme="nord"] {
+	--background: #242933;
+	--surface: #2e3440;
+	--surface-light: #3b4252;
+	--border: #434c5e;
+
+	--text: #eceff4;
+	--text-muted: #aeb8c5;
+
+	--accent: #88c0d0;
+	--accent-muted: #354b55;
+
+	--code-background: #20242d;
+	--tag-background: #292f3a;
+
+	color-scheme: dark;
+}
+
+	* {
+		box-sizing: border-box;
+	}
+
+	html {
+		margin: 0;
+		padding: 0;
+		background: var(--background);
+		color: var(--text);
+		font-family:
+			Inter,
+			ui-sans-serif,
+			system-ui,
+			-apple-system,
+			BlinkMacSystemFont,
+			"Segoe UI",
+			sans-serif;
+	}
+
 	body {
 		margin: 0;
-		width: 100%;
-		height: 100%;
+		min-height: 100vh;
+		background:
+			radial-gradient(
+				circle at 50% -20%,
+				rgba(85, 214, 190, 0.08),
+				transparent 35%
+			),
+			var(--background);
 	}
+
+	a {
+		color: inherit;
+	}
+
+	.site-header {
+		border-bottom: 1px solid var(--border);
+		background: rgba(9, 13, 18, 0.88);
+		backdrop-filter: blur(12px);
+		position: sticky;
+		top: 0;
+		z-index: 100;
+	}
+
+	.nav-container {
+		max-width: var(--content-width);
+		margin: 0 auto;
+		padding: 0 24px;
+		height: 72px;
+
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+.brand {
+	display: flex;
+	align-items: center;
+	text-decoration: none;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+}
+
+.brand-prompt {
+	color: var(--accent);
+	margin-right: 8px;
+}
+
+.brand-aec {
+	color: #e6edf3;
+}
+
+.brand-sec {
+	color: var(--accent);
+}
+
+	.prompt {
+		color: var(--accent);
+		margin-right: 8px;
+	}
+
+	.accent {
+		color: var(--accent);
+	}
+
+	.nav-links {
+		display: flex;
+		align-items: center;
+		gap: 30px;
+	}
+
+	.nav-links a {
+		color: var(--text-muted);
+		text-decoration: none;
+		font-size: 14px;
+		font-weight: 500;
+		transition:
+			color 150ms ease,
+			transform 150ms ease;
+	}
+
+	.nav-links a:hover {
+		color: var(--accent);
+	}
+
+	.page {
+		width: 100%;
+		min-height: calc(100vh - 145px);
+	}
+
+	footer {
+		border-top: 1px solid var(--border);
+		margin-top: 80px;
+	}
+
+	.footer-container {
+		max-width: var(--content-width);
+		margin: 0 auto;
+		padding: 28px 24px;
+
+		display: flex;
+		justify-content: space-between;
+
+		color: var(--text-muted);
+		font-size: 13px;
+	}
+
+	@media (max-width: 720px) {
+		.nav-container {
+			height: auto;
+			padding-top: 18px;
+			padding-bottom: 18px;
+			align-items: flex-start;
+			gap: 20px;
+			flex-direction: column;
+		}
+
+		.nav-links {
+			width: 100%;
+			gap: 18px;
+			overflow-x: auto;
+			padding-bottom: 4px;
+		}
+
+		.footer-container {
+			flex-direction: column;
+			gap: 8px;
+		}
+	}
+	.theme-picker {
+	position: relative;
+	margin-left: 10px;
+}
+
+.theme-button {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+
+	padding: 7px 10px;
+
+	border: 1px solid var(--border);
+	border-radius: 5px;
+
+	background: var(--surface);
+	color: var(--text-muted);
+
+	font-family: "SFMono-Regular", Consolas, monospace;
+	font-size: 11px;
+
+	cursor: pointer;
+}
+
+.theme-button:hover {
+	color: var(--accent);
+	border-color: var(--accent);
+}
+
+.theme-icon {
+	color: var(--accent);
+	font-size: 14px;
+}
+
+.theme-arrow {
+	font-size: 10px;
+}
+
+.theme-menu {
+	position: absolute;
+	top: calc(100% + 8px);
+	right: 0;
+
+	width: 160px;
+	padding: 6px;
+
+	border: 1px solid var(--border);
+	border-radius: 7px;
+
+	background: var(--surface);
+
+	box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+
+	z-index: 1000;
+}
+
+.theme-menu button {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+
+	width: 100%;
+	padding: 9px 10px;
+
+	border: 0;
+	border-radius: 4px;
+
+	background: transparent;
+	color: var(--text-muted);
+
+	font-family: "SFMono-Regular", Consolas, monospace;
+	font-size: 11px;
+	text-align: left;
+
+	cursor: pointer;
+}
+
+.theme-menu button:hover {
+	background: var(--surface-light);
+	color: var(--text);
+}
+
+.theme-dot {
+	width: 9px;
+	height: 9px;
+	border-radius: 50%;
+	flex-shrink: 0;
+}
+
+.dark-dot {
+	background: #0c1614;
+}
+
+.midnight-dot {
+	background: #630616;
+}
+
+.light-dot {
+	background: #edf0ef;
+}
+
+.terminal-dot {
+	background: #0cbd24;
+}
+
+.nord-dot {
+	background: #1f0bcc;
+}
+.theme-menu[hidden] {
+	display: none;
+}
 </style>
