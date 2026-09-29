@@ -1,0 +1,541 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const labs = (await getCollection('labs'))
+	.filter((lab) => !lab.data.draft)
+	.sort(
+		(a, b) =>
+			b.data.published.getTime() -
+			a.data.published.getTime()
+	);
+
+const featuredLab = labs.find((lab) => lab.data.featured);
+
+const otherLabs = featuredLab
+	? labs.filter((lab) => lab.id !== featuredLab.id)
+	: labs;
+---
+
+<Layout
+	title="Labs | AEC Security"
+	description="Hands-on offensive security labs, vulnerable machines, Active Directory environments and exploitation walkthroughs."
+>
+	<main>
+		<section class="hero">
+			<div class="breadcrumb">
+				<a href="/">AECSEC</a>
+				<span>/</span>
+				<span>LABS</span>
+			</div>
+
+			<span class="eyebrow">HANDS-ON SECURITY</span>
+
+			<h1>Labs & Machines</h1>
+
+			<p class="hero-description">
+				Practical offensive security write-ups covering vulnerable machines,
+				Active Directory environments, web applications, exploitation and
+				privilege escalation.
+			</p>
+		</section>
+
+		{featuredLab && (
+			<section class="featured-section">
+				<div class="section-label">
+					<span>FEATURED LAB</span>
+				</div>
+
+				<a
+					class="featured"
+					href={`/labs/${featuredLab.id}`}
+				>
+					<div class="featured-content">
+						<div class="meta">
+							<span>{featuredLab.data.platform}</span>
+							<span>/</span>
+							<span>{featuredLab.data.category}</span>
+							<span>/</span>
+							<span>{featuredLab.data.difficulty}</span>
+						</div>
+
+						<h2>{featuredLab.data.title}</h2>
+
+						<p>{featuredLab.data.description}</p>
+
+						{featuredLab.data.tags.length > 0 && (
+							<div class="tags">
+								{featuredLab.data.tags.map((tag) => (
+									<span>{tag}</span>
+								))}
+							</div>
+						)}
+					</div>
+
+					<div class="featured-side">
+						<span class="os">{featuredLab.data.os}</span>
+						<span class="arrow">→</span>
+					</div>
+				</a>
+			</section>
+		)}
+
+		<section class="archive">
+			<div class="archive-header">
+				<div>
+					<span class="eyebrow">ARCHIVE</span>
+					<h2>Lab Write-ups</h2>
+				</div>
+
+				<span class="count">
+					{labs.length} {labs.length === 1 ? 'LAB' : 'LABS'}
+				</span>
+			</div>
+
+			<div class="filters">
+				<button class="active" type="button">All</button>
+				<button type="button">Web</button>
+				<button type="button">Active Directory</button>
+				<button type="button">Linux</button>
+				<button type="button">Windows</button>
+				<button type="button">Network</button>
+				<button type="button">Cloud</button>
+			</div>
+
+			{otherLabs.length > 0 ? (
+				<div class="lab-list">
+					{otherLabs.map((lab) => (
+						<a
+							class="lab"
+							href={`/labs/${lab.id}`}
+						>
+							<div class="lab-date">
+								<span>
+									{lab.data.published.toLocaleDateString('en-GB', {
+										day: '2-digit',
+										month: 'short',
+										year: 'numeric',
+									})}
+								</span>
+							</div>
+
+							<div class="lab-main">
+								<div class="meta">
+									<span>{lab.data.platform}</span>
+									<span>/</span>
+									<span>{lab.data.category}</span>
+									<span>/</span>
+									<span>{lab.data.difficulty}</span>
+								</div>
+
+								<h3>{lab.data.title}</h3>
+
+								<p>{lab.data.description}</p>
+
+								{lab.data.tags.length > 0 && (
+									<div class="tags">
+										{lab.data.tags.map((tag) => (
+											<span>{tag}</span>
+										))}
+									</div>
+								)}
+							</div>
+
+							<div class="lab-side">
+								<span>{lab.data.os}</span>
+								<span class="arrow">→</span>
+							</div>
+						</a>
+					))}
+				</div>
+			) : (
+				<div class="empty-state">
+					<span class="empty-code">LAB_ARCHIVE_EMPTY</span>
+
+					<h3>No additional labs published yet.</h3>
+
+					<p>
+						Lab write-ups will appear here as they are published.
+					</p>
+				</div>
+			)}
+		</section>
+	</main>
+</Layout>
+
+<style>
+	main {
+		max-width: 1320px;
+		margin: 0 auto;
+		padding: 0 32px;
+	}
+
+	.hero {
+		padding: 75px 0 70px;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.breadcrumb {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		margin-bottom: 55px;
+
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 11px;
+		letter-spacing: 0.08em;
+		color: var(--text-muted);
+	}
+
+	.breadcrumb a {
+		color: var(--accent);
+		text-decoration: none;
+	}
+
+	.eyebrow {
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 11px;
+		letter-spacing: 0.14em;
+		color: var(--accent);
+	}
+
+	h1 {
+		margin: 12px 0 22px;
+		font-size: clamp(48px, 6vw, 72px);
+		line-height: 1;
+		letter-spacing: -0.05em;
+	}
+
+	.hero-description {
+		max-width: 760px;
+		margin: 0;
+		color: var(--text-muted);
+		font-size: 16px;
+		line-height: 1.8;
+	}
+
+	.featured-section {
+		padding: 65px 0 80px;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.section-label {
+		margin-bottom: 18px;
+
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 10px;
+		letter-spacing: 0.12em;
+		color: var(--accent);
+	}
+
+	.featured {
+		display: flex;
+		justify-content: space-between;
+		gap: 50px;
+
+		padding: 38px;
+		border: 1px solid var(--border);
+		border-radius: 9px;
+		background: var(--surface);
+
+		color: inherit;
+		text-decoration: none;
+
+		transition:
+			transform 160ms ease,
+			border-color 160ms ease,
+			background 160ms ease;
+	}
+
+	.featured:hover {
+		transform: translateY(-3px);
+		border-color: var(--accent);
+		background: var(--surface-light);
+	}
+
+	.featured-content {
+		max-width: 850px;
+	}
+
+	.meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 10px;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--text-muted);
+	}
+
+	.featured h2 {
+		margin: 16px 0 12px;
+		font-size: 30px;
+		letter-spacing: -0.03em;
+	}
+
+	.featured p {
+		margin: 0;
+		color: var(--text-muted);
+		line-height: 1.75;
+	}
+
+	.featured-side {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		justify-content: space-between;
+		flex-shrink: 0;
+	}
+
+	.os {
+		padding: 6px 9px;
+		border: 1px solid var(--border);
+		border-radius: 4px;
+
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 10px;
+		color: var(--text-muted);
+	}
+
+	.arrow {
+		font-size: 22px;
+		color: var(--text-muted);
+		transition: 150ms ease;
+	}
+
+	.featured:hover .arrow,
+	.lab:hover .arrow {
+		color: var(--accent);
+		transform: translateX(3px);
+	}
+
+	.tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		margin-top: 20px;
+	}
+
+	.tags span {
+		padding: 4px 7px;
+		border: 1px solid var(--border);
+		border-radius: 4px;
+		background: var(--tag-background);
+
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 9px;
+		color: var(--text-muted);
+	}
+
+	.archive {
+		padding: 75px 0 110px;
+	}
+
+	.archive-header {
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 30px;
+		margin-bottom: 28px;
+	}
+
+	.archive-header h2 {
+		margin: 8px 0 0;
+		font-size: 32px;
+		letter-spacing: -0.03em;
+	}
+
+	.count {
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 10px;
+		letter-spacing: 0.1em;
+		color: var(--text-muted);
+	}
+
+	.filters {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 7px;
+		margin-bottom: 35px;
+	}
+
+	.filters button {
+		padding: 7px 10px;
+		border: 1px solid var(--border);
+		border-radius: 5px;
+		background: var(--surface);
+		color: var(--text-muted);
+		cursor: pointer;
+	}
+
+	.filters button.active {
+		border-color: var(--accent);
+		background: var(--accent-muted);
+		color: var(--accent);
+	}
+
+	.lab-list {
+		border-top: 1px solid var(--border);
+	}
+
+	.lab {
+		display: grid;
+		grid-template-columns: 125px minmax(0, 1fr) auto;
+		align-items: center;
+		gap: 35px;
+
+		padding: 28px 8px;
+		border-bottom: 1px solid var(--border);
+
+		color: inherit;
+		text-decoration: none;
+
+		transition:
+			padding 150ms ease,
+			background 150ms ease;
+	}
+
+	.lab:hover {
+		padding-left: 16px;
+		padding-right: 16px;
+		background: var(--surface);
+	}
+
+	.lab-date {
+		align-self: start;
+		padding-top: 3px;
+
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 10px;
+		color: var(--text-muted);
+	}
+
+	.lab h3 {
+		margin: 9px 0 7px;
+		font-size: 19px;
+	}
+
+	.lab p {
+		max-width: 800px;
+		margin: 0;
+		color: var(--text-muted);
+		font-size: 13px;
+		line-height: 1.65;
+	}
+
+	.lab-side {
+		display: flex;
+		align-items: center;
+		gap: 25px;
+
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 10px;
+		color: var(--text-muted);
+	}
+
+	.empty-state {
+		padding: 90px 30px;
+		border: 1px dashed var(--border);
+		border-radius: 8px;
+		background: var(--surface);
+		text-align: center;
+	}
+
+	.empty-code {
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 10px;
+		letter-spacing: 0.12em;
+		color: var(--accent);
+	}
+
+	.empty-state h3 {
+		margin: 14px 0 10px;
+		font-size: 21px;
+	}
+
+	.empty-state p {
+		margin: 0;
+		color: var(--text-muted);
+		font-size: 14px;
+	}
+
+	@media (max-width: 800px) {
+		.lab {
+			grid-template-columns: 1fr;
+			gap: 12px;
+		}
+
+		.lab-side {
+			justify-content: space-between;
+		}
+
+		.featured {
+			flex-direction: column;
+		}
+
+		.featured-side {
+			flex-direction: row;
+			align-items: center;
+		}
+	}
+
+	@media (max-width: 650px) {
+		main {
+			padding: 0 18px;
+		}
+
+		.hero {
+			padding: 55px 0;
+		}
+
+		.breadcrumb {
+			margin-bottom: 40px;
+		}
+
+		.archive {
+			padding-top: 60px;
+		}
+	}
+</style>

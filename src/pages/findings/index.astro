@@ -1,0 +1,516 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const findings = (await getCollection('findings'))
+	.filter((finding) => !finding.data.draft)
+	.sort((a, b) => a.data.title.localeCompare(b.data.title));
+
+const categories = [...new Set(findings.map((finding) => finding.data.category))].sort();
+---
+
+<Layout
+	title="Findings | AEC Security"
+	description="A reusable database of penetration testing findings, vulnerabilities, security weaknesses and remediation guidance."
+>
+	<main>
+		<section class="hero">
+			<div class="breadcrumb">
+				<a href="/">AECSEC</a>
+				<span>/</span>
+				<span>FINDINGS</span>
+			</div>
+
+			<div class="hero-grid">
+				<div>
+					<span class="eyebrow">VULNERABILITY DATABASE</span>
+
+					<h1>Findings</h1>
+
+					<p class="hero-description">
+						A reusable knowledge base of penetration testing findings covering
+						common vulnerabilities, security misconfigurations, weaknesses,
+						impact and remediation guidance.
+					</p>
+				</div>
+
+				<div class="database-info">
+					<div>
+						<span class="info-value">{findings.length}</span>
+						<span class="info-label">FINDINGS</span>
+					</div>
+
+					<div>
+						<span class="info-value">{categories.length}</span>
+						<span class="info-label">CATEGORIES</span>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section class="database">
+			<div class="toolbar">
+				<div class="search">
+					<span>⌕</span>
+
+					<input
+						type="search"
+						placeholder="Search findings..."
+						aria-label="Search findings"
+						disabled
+					/>
+				</div>
+
+				<div class="filters">
+					<button class="active" type="button">All</button>
+					<button type="button">Critical</button>
+					<button type="button">High</button>
+					<button type="button">Medium</button>
+					<button type="button">Low</button>
+					<button type="button">Info</button>
+				</div>
+			</div>
+
+			{findings.length > 0 ? (
+				<div class="finding-list">
+					{findings.map((finding) => (
+						<a
+							class="finding"
+							href={`/findings/${finding.id}`}
+						>
+							<div class="finding-main">
+								<div class="finding-meta">
+									<span class={`severity severity-${finding.data.severity.toLowerCase()}`}>
+										{finding.data.severity}
+									</span>
+
+									<span>{finding.data.category}</span>
+
+									{finding.data.cwe && (
+										<span>{finding.data.cwe}</span>
+									)}
+								</div>
+
+								<h2>{finding.data.title}</h2>
+
+								<p>{finding.data.description}</p>
+
+								{finding.data.tags.length > 0 && (
+									<div class="tags">
+										{finding.data.tags.map((tag) => (
+											<span>{tag}</span>
+										))}
+									</div>
+								)}
+							</div>
+
+							<span class="finding-arrow">→</span>
+						</a>
+					))}
+				</div>
+			) : (
+				<div class="empty-state">
+					<span class="empty-code">DATABASE_EMPTY</span>
+
+					<h2>No findings published yet.</h2>
+
+					<p>
+						The vulnerability database is ready. Published finding templates
+						will appear here automatically.
+					</p>
+				</div>
+			)}
+		</section>
+
+		<section class="about-database">
+			<span class="eyebrow">ABOUT THE DATABASE</span>
+
+			<div class="about-grid">
+				<h2>Reusable security knowledge.</h2>
+
+				<p>
+					Findings are structured as reusable penetration testing references,
+					with consistent descriptions, impact statements, remediation guidance
+					and vulnerability classifications.
+				</p>
+			</div>
+		</section>
+	</main>
+</Layout>
+
+<style>
+	main {
+		max-width: 1320px;
+		margin: 0 auto;
+		padding: 0 32px;
+	}
+
+	.hero {
+		padding: 75px 0 65px;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.breadcrumb {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		margin-bottom: 55px;
+
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 11px;
+		letter-spacing: 0.08em;
+		color: var(--text-muted);
+	}
+
+	.breadcrumb a {
+		color: var(--accent);
+		text-decoration: none;
+	}
+
+	.hero-grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		align-items: end;
+		gap: 80px;
+	}
+
+	.eyebrow {
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 11px;
+		letter-spacing: 0.14em;
+		color: var(--accent);
+	}
+
+	h1 {
+		font-size: clamp(48px, 6vw, 72px);
+		line-height: 1;
+		letter-spacing: -0.05em;
+		margin: 12px 0 22px;
+	}
+
+	.hero-description {
+		max-width: 720px;
+		margin: 0;
+		color: var(--text-muted);
+		font-size: 16px;
+		line-height: 1.8;
+	}
+
+	.database-info {
+		display: flex;
+		gap: 45px;
+		padding-bottom: 5px;
+	}
+
+	.database-info > div {
+		display: flex;
+		flex-direction: column;
+		gap: 7px;
+	}
+
+	.info-value {
+		font-size: 28px;
+		font-weight: 700;
+	}
+
+	.info-label {
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 9px;
+		letter-spacing: 0.12em;
+		color: var(--text-muted);
+	}
+
+	.database {
+		padding: 45px 0 90px;
+	}
+
+	.toolbar {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 30px;
+		margin-bottom: 32px;
+	}
+
+	.search {
+		width: min(390px, 100%);
+		height: 42px;
+		display: flex;
+		align-items: center;
+		gap: 10px;
+
+		padding: 0 13px;
+		border: 1px solid var(--border);
+		border-radius: 6px;
+		background: var(--surface);
+		color: var(--text-muted);
+	}
+
+	.search input {
+		width: 100%;
+		border: 0;
+		outline: 0;
+		background: transparent;
+		color: var(--text);
+		font: inherit;
+	}
+
+	.search input::placeholder {
+		color: var(--text-muted);
+	}
+
+	.filters {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 7px;
+	}
+
+	.filters button {
+		padding: 7px 10px;
+		border: 1px solid var(--border);
+		border-radius: 5px;
+		background: var(--surface);
+		color: var(--text-muted);
+		cursor: pointer;
+	}
+
+	.filters button.active {
+		border-color: var(--accent);
+		color: var(--accent);
+		background: var(--accent-muted);
+	}
+
+	.finding-list {
+		border-top: 1px solid var(--border);
+	}
+
+	.finding {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 40px;
+
+		padding: 28px 8px;
+		border-bottom: 1px solid var(--border);
+
+		color: inherit;
+		text-decoration: none;
+
+		transition:
+			background 150ms ease,
+			padding 150ms ease;
+	}
+
+	.finding:hover {
+		padding-left: 16px;
+		padding-right: 16px;
+		background: var(--surface);
+	}
+
+	.finding-main {
+		min-width: 0;
+	}
+
+	.finding-meta {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 9px;
+		margin-bottom: 10px;
+
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 10px;
+		color: var(--text-muted);
+	}
+
+	.severity {
+		padding: 3px 6px;
+		border: 1px solid var(--border);
+		border-radius: 4px;
+	}
+
+	.severity-critical {
+		color: #ff6b6b;
+	}
+
+	.severity-high {
+		color: #ff8e72;
+	}
+
+	.severity-medium {
+		color: #e7b75f;
+	}
+
+	.severity-low {
+		color: #70a5eb;
+	}
+
+	.severity-informational,
+	.severity-n\/a {
+		color: var(--text-muted);
+	}
+
+	.finding h2 {
+		margin: 0 0 8px;
+		font-size: 19px;
+		letter-spacing: -0.015em;
+	}
+
+	.finding p {
+		max-width: 850px;
+		margin: 0;
+		color: var(--text-muted);
+		font-size: 13px;
+		line-height: 1.65;
+	}
+
+	.tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		margin-top: 14px;
+	}
+
+	.tags span {
+		padding: 4px 7px;
+		border: 1px solid var(--border);
+		border-radius: 4px;
+		background: var(--tag-background);
+
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 9px;
+		color: var(--text-muted);
+	}
+
+	.finding-arrow {
+		flex-shrink: 0;
+		font-size: 21px;
+		color: var(--text-muted);
+		transition: 150ms ease;
+	}
+
+	.finding:hover .finding-arrow {
+		color: var(--accent);
+		transform: translateX(3px);
+	}
+
+	.empty-state {
+		padding: 90px 30px;
+		border: 1px dashed var(--border);
+		border-radius: 8px;
+		background: var(--surface);
+		text-align: center;
+	}
+
+	.empty-code {
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 10px;
+		letter-spacing: 0.12em;
+		color: var(--accent);
+	}
+
+	.empty-state h2 {
+		margin: 14px 0 10px;
+		font-size: 22px;
+	}
+
+	.empty-state p {
+		max-width: 520px;
+		margin: 0 auto;
+		color: var(--text-muted);
+		font-size: 14px;
+		line-height: 1.7;
+	}
+
+	.about-database {
+		padding: 70px 0 90px;
+		border-top: 1px solid var(--border);
+	}
+
+	.about-grid {
+		display: grid;
+		grid-template-columns: 0.7fr 1fr;
+		gap: 80px;
+		margin-top: 20px;
+	}
+
+	.about-grid h2 {
+		margin: 0;
+		font-size: 30px;
+		letter-spacing: -0.03em;
+	}
+
+	.about-grid p {
+		max-width: 650px;
+		margin: 0;
+		color: var(--text-muted);
+		line-height: 1.8;
+	}
+
+	@media (max-width: 850px) {
+		.hero-grid {
+			grid-template-columns: 1fr;
+			gap: 35px;
+		}
+
+		.toolbar {
+			align-items: stretch;
+			flex-direction: column;
+		}
+
+		.search {
+			width: 100%;
+		}
+
+		.about-grid {
+			grid-template-columns: 1fr;
+			gap: 20px;
+		}
+	}
+
+	@media (max-width: 650px) {
+		main {
+			padding: 0 18px;
+		}
+
+		.hero {
+			padding: 55px 0;
+		}
+
+		.breadcrumb {
+			margin-bottom: 40px;
+		}
+
+		.database-info {
+			gap: 30px;
+		}
+
+		.finding {
+			gap: 20px;
+		}
+	}
+</style>

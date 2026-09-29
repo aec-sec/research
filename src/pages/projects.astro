@@ -1,0 +1,549 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+	title="Projects | AEC Security"
+	description="Security tooling, technical projects, experiments and open-source work developed alongside offensive security research."
+>
+	<main>
+		<!-- PAGE HEADER -->
+		<section class="page-header">
+			<div class="breadcrumb">
+				<a href="/">AECSEC</a>
+				<span>/</span>
+				<span>PROJECTS</span>
+			</div>
+
+			<div class="page-title">
+				<span class="portfolio-title">PROJECT PORTFOLIO</span>
+			</div>
+		</section>
+
+		<!-- PROJECTS -->
+		<section class="projects">
+			<!--
+				PROJECT TEMPLATE
+
+				Duplicate this block when you have a project to publish.
+
+				<article class="project">
+					<div class="project-number">01</div>
+
+					<div class="project-content">
+						<div class="project-meta">
+							<span class="status status-active">ACTIVE</span>
+							<span>Security Tooling</span>
+						</div>
+
+						<h3>Project Name</h3>
+
+						<p class="project-description">
+							Short explanation of what the project does and why it exists.
+						</p>
+
+						<div class="project-tags">
+							<span>Python</span>
+							<span>Security</span>
+							<span>Automation</span>
+						</div>
+					</div>
+
+					<div class="project-action">
+						<a href="#">View Project →</a>
+					</div>
+				</article>
+			-->
+
+			<div class="empty-projects">
+				<div class="empty-icon">&gt;_</div>
+
+				<div>
+					<span class="empty-label">PROJECTS_INITIALISING</span>
+
+					<h3>Projects are currently in development.</h3>
+
+					<p>
+						Security tooling, experiments and technical projects will
+						appear here as they are developed and released.
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<!-- AREAS -->
+		<section class="project-types">
+			<div class="section-label">
+				<span>AREAS</span>
+			</div>
+
+			<div class="type-grid">
+				<div class="type">
+					<span>01</span>
+
+					<div>
+						<h3>Security Tooling</h3>
+						<p>
+							Utilities and tools designed to support offensive security,
+							research and technical workflows.
+						</p>
+					</div>
+				</div>
+
+				<div class="type">
+					<span>02</span>
+
+					<div>
+						<h3>Research Projects</h3>
+						<p>
+							Technical experiments created to investigate vulnerabilities,
+							attack techniques and security controls.
+						</p>
+					</div>
+				</div>
+
+				<div class="type">
+					<span>03</span>
+
+					<div>
+						<h3>Labs & Infrastructure</h3>
+						<p>
+							Purpose-built environments for reproducing vulnerabilities,
+							testing techniques and developing practical skills.
+						</p>
+					</div>
+				</div>
+
+				<div class="type">
+					<span>04</span>
+
+					<div>
+						<h3>Experiments</h3>
+						<p>
+							Smaller concepts, prototypes and technical ideas worth
+							exploring or documenting.
+						</p>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- APPROACH -->
+		<section class="approach">
+			<div class="approach-number">01</div>
+
+			<div>
+				<span class="portfolio-title">Portfolio</span>
+
+				<h2>
+					Practical work alongside security research.
+				</h2>
+
+				<p>
+					This section contains selected technical work developed through
+					research, experimentation and offensive security. Projects are
+					included where they demonstrate useful technical capability rather
+					than simply to build a large catalogue.
+				</p>
+			</div>
+		</section>
+	</main>
+</Layout>
+
+<style>
+	main {
+		max-width: 1320px;
+		margin: 0 auto;
+		padding: 0 32px;
+	}
+
+	/* PAGE HEADER */
+
+	.page-header {
+	padding: 70px 0 45px;
+}
+
+	.breadcrumb {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		margin-bottom: 45px;
+
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 11px;
+		letter-spacing: 0.08em;
+		color: var(--text-muted);
+	}
+
+	.breadcrumb a {
+		color: var(--accent);
+		text-decoration: none;
+	}
+
+	.portfolio-title {
+	font-family:
+		"SFMono-Regular",
+		Consolas,
+		monospace;
+	font-size: 46px;
+	letter-spacing: 0.17em;
+	color: var(--accent);
+}
+
+	h1 {
+		margin: 10px 0 0;
+		font-size: clamp(42px, 5vw, 58px);
+		line-height: 1;
+		letter-spacing: -0.045em;
+	}
+
+	/* PROJECTS */
+
+	.projects {
+	padding: 25px 0 90px;
+	border-bottom: 1px solid var(--border);
+}
+
+	.section-header {
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 40px;
+		margin-bottom: 40px;
+	}
+
+	.section-header h2 {
+		margin: 8px 0 0;
+		font-size: 32px;
+		letter-spacing: -0.035em;
+	}
+
+	.project-count {
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 10px;
+		letter-spacing: 0.12em;
+		color: var(--text-muted);
+	}
+
+	.project {
+		display: grid;
+		grid-template-columns: 60px minmax(0, 1fr) auto;
+		gap: 35px;
+		align-items: start;
+
+		padding: 35px 8px;
+		border-top: 1px solid var(--border);
+	}
+
+	.project:last-child {
+		border-bottom: 1px solid var(--border);
+	}
+
+	.project-number {
+		padding-top: 3px;
+
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 10px;
+		color: var(--accent);
+	}
+
+	.project-meta {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 10px;
+
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 10px;
+		color: var(--text-muted);
+	}
+
+	.status {
+		padding: 3px 6px;
+		border: 1px solid var(--border);
+		border-radius: 4px;
+	}
+
+	.status-active {
+		color: var(--accent);
+	}
+
+	.project h3 {
+		margin: 12px 0 10px;
+		font-size: 23px;
+		letter-spacing: -0.02em;
+	}
+
+	.project-description {
+		max-width: 720px;
+		margin: 0;
+		color: var(--text-muted);
+		font-size: 14px;
+		line-height: 1.7;
+	}
+
+	.project-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		margin-top: 18px;
+	}
+
+	.project-tags span {
+		padding: 4px 7px;
+		border: 1px solid var(--border);
+		border-radius: 4px;
+		background: var(--tag-background);
+
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 9px;
+		color: var(--text-muted);
+	}
+
+	.project-action a {
+		color: var(--accent);
+		font-size: 12px;
+		text-decoration: none;
+		white-space: nowrap;
+	}
+
+	.project-action a:hover {
+		text-decoration: underline;
+	}
+
+	/* EMPTY PROJECT STATE */
+
+	.empty-projects {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		align-items: center;
+		gap: 30px;
+
+		padding: 55px;
+		border: 1px dashed var(--border);
+		border-radius: 9px;
+		background: var(--surface);
+	}
+
+	.empty-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		width: 70px;
+		height: 70px;
+
+		border: 1px solid var(--border);
+		border-radius: 8px;
+
+		background: var(--code-background);
+		color: var(--accent);
+
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 18px;
+	}
+
+	.empty-label {
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 9px;
+		letter-spacing: 0.13em;
+		color: var(--accent);
+	}
+
+	.empty-projects h3 {
+		margin: 9px 0;
+		font-size: 21px;
+	}
+
+	.empty-projects p {
+		max-width: 650px;
+		margin: 0;
+		color: var(--text-muted);
+		font-size: 14px;
+		line-height: 1.7;
+	}
+
+	/* PROJECT AREAS */
+
+	.project-types {
+		padding: 75px 0;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.section-label {
+		margin-bottom: 30px;
+
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 10px;
+		letter-spacing: 0.13em;
+		color: var(--accent);
+	}
+
+	.type-grid {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		border-top: 1px solid var(--border);
+		border-left: 1px solid var(--border);
+	}
+
+	.type {
+		display: flex;
+		gap: 25px;
+		padding: 30px;
+
+		border-right: 1px solid var(--border);
+		border-bottom: 1px solid var(--border);
+
+		background: var(--surface);
+	}
+
+	.type > span {
+		flex-shrink: 0;
+
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 10px;
+		color: var(--accent);
+	}
+
+	.type h3 {
+		margin: 0 0 9px;
+		font-size: 17px;
+	}
+
+	.type p {
+		margin: 0;
+		color: var(--text-muted);
+		font-size: 13px;
+		line-height: 1.7;
+	}
+
+	/* APPROACH */
+
+	.approach {
+		display: grid;
+		grid-template-columns: 100px minmax(0, 700px);
+		gap: 45px;
+
+		padding: 80px 0 110px;
+	}
+
+	.approach-number {
+		font-family:
+			"SFMono-Regular",
+			Consolas,
+			monospace;
+
+		font-size: 11px;
+		color: var(--accent);
+		padding-top: 5px;
+	}
+
+	.approach h2 {
+		margin: 12px 0 18px;
+		font-size: 30px;
+		line-height: 1.25;
+		letter-spacing: -0.035em;
+	}
+
+	.approach p {
+		margin: 0;
+		color: var(--text-muted);
+		font-size: 14px;
+		line-height: 1.8;
+	}
+
+	/* RESPONSIVE */
+
+	@media (max-width: 850px) {
+		.type-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.project {
+			grid-template-columns: 40px 1fr;
+		}
+
+		.project-action {
+			grid-column: 2;
+		}
+	}
+
+	@media (max-width: 650px) {
+		main {
+			padding: 0 18px;
+		}
+
+		.page-header {
+			padding: 50px 0 45px;
+		}
+
+		.breadcrumb {
+			margin-bottom: 35px;
+		}
+
+		h1 {
+			font-size: 42px;
+		}
+
+		.projects,
+		.project-types {
+			padding: 60px 0;
+		}
+
+		.empty-projects {
+			grid-template-columns: 1fr;
+			padding: 30px;
+		}
+
+		.approach {
+			grid-template-columns: 1fr;
+			gap: 15px;
+			padding: 60px 0 85px;
+		}
+        .portfolio-title {
+	font-family:
+		"SFMono-Regular",
+		Consolas,
+		monospace;
+	font-size: 18px;
+	letter-spacing: 0.14em;
+	color: var(--accent);
+}
+	}
+</style>

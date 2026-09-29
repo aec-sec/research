@@ -42,6 +42,104 @@ const research = defineCollection({
 	}),
 });
 
+const findings = defineCollection({
+	loader: glob({
+		pattern: '**/*.{md,mdx}',
+		base: './src/content/findings',
+	}),
+	schema: z.object({
+		title: z.string(),
+		description: z.string(),
+
+		severity: z.enum([
+			'Critical',
+			'High',
+			'Medium',
+			'Low',
+			'Informational',
+			'N/A',
+		]),
+
+		category: z.enum([
+			'Access Control',
+			'Authentication',
+			'Authorisation',
+			'Cryptography',
+			'Configuration',
+			'Error Handling',
+			'Information Disclosure',
+			'Injection',
+			'Network Security',
+			'Session Management',
+			'Transport Security',
+			'Third-Party Components',
+			'Other',
+		]),
+
+		cwe: z.string().optional(),
+		owasp: z.string().optional(),
+
+		tags: z.array(z.string()).default([]),
+
+		draft: z.boolean().default(false),
+	}),
+});
+
+const labs = defineCollection({
+	loader: glob({
+		pattern: '**/*.{md,mdx}',
+		base: './src/content/labs',
+	}),
+	schema: z.object({
+		title: z.string(),
+		description: z.string(),
+		published: z.coerce.date(),
+		updated: z.coerce.date().optional(),
+
+		platform: z.enum([
+			'Hack The Box',
+			'TryHackMe',
+			'PortSwigger',
+			'Custom Lab',
+			'CTF',
+			'Other',
+		]),
+
+		category: z.enum([
+			'Web',
+			'Active Directory',
+			'Linux',
+			'Windows',
+			'Network',
+			'Cloud',
+			'Exploit Development',
+			'Mixed',
+		]),
+
+		difficulty: z.enum([
+			'Easy',
+			'Medium',
+			'Hard',
+			'Insane',
+			'N/A',
+		]).default('N/A'),
+
+		os: z.enum([
+			'Linux',
+			'Windows',
+			'Multiple',
+			'N/A',
+		]).default('N/A'),
+
+		tags: z.array(z.string()).default([]),
+
+		featured: z.boolean().default(false),
+		draft: z.boolean().default(false),
+	}),
+});
+
 export const collections = {
 	research,
+	findings,
+    labs,
 };

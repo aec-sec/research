@@ -44,9 +44,20 @@ const {
 
 <style>
 	.toc {
-		width: 240px;
-		flex-shrink: 0;
-	}
+	position: sticky;
+	top: 90px;
+
+	width: 240px;
+	max-height: calc(100vh - 120px);
+
+	overflow-y: auto;
+	overflow-x: hidden;
+
+	padding-right: 12px;
+
+	scrollbar-width: thin;
+	scrollbar-color: var(--border) transparent;
+}
 
 	.toc-inner {
 		position: sticky;

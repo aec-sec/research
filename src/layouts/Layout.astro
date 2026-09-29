@@ -52,7 +52,7 @@ const {
 				<div class="nav-links">
 					<a href="/research">Research</a>
 					<a href="/labs">Labs</a>
-					<a href="/notes">Notes</a>
+					<a href="/findings">Findings</a>
 					<a href="/projects">Projects</a>
 					<a href="/about">About</a>
 				</div>
@@ -210,6 +210,11 @@ if (savedTheme && themeLabels[savedTheme]) {
 	--tag-background: #090e13;
 
 	--content-width: 1180px;
+	--article-page-width: 1500px;
+--article-content-width: 1000px;
+--article-nav-width: 240px;
+--article-gap: 45px;
+--article-side-padding: 20px;
 
 	color-scheme: dark;
 }
@@ -335,15 +340,16 @@ if (savedTheme && themeLabels[savedTheme]) {
 	}
 
 	.nav-container {
-		max-width: var(--content-width);
-		margin: 0 auto;
-		padding: 0 24px;
-		height: 72px;
+	width: 100%;
+	max-width: var(--article-page-width);
+	margin: 0 auto;
+	padding: 0 var(--article-side-padding);
+	height: 72px;
 
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
 
 .brand {
 	display: flex;
@@ -549,5 +555,9 @@ if (savedTheme && themeLabels[savedTheme]) {
 }
 .theme-menu[hidden] {
 	display: none;
+}
+
+html {
+	font-size: 130%;
 }
 </style>

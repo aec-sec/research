@@ -6,7 +6,7 @@ category: "General Research"
 tags:
   - Testing
   - Astro
-featured: true
+featured: false
 draft: false
 ---
 
