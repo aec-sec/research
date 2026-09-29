@@ -243,10 +243,11 @@ import Layout from '../layouts/Layout.astro';
 
 <style>
 	main {
-		max-width: 1180px;
-		margin: 0 auto;
-		padding: 0 24px;
-	}
+	width: 100%;
+	max-width: var(--article-page-width);
+	margin: 0 auto;
+	padding: 0 var(--article-side-padding);
+}
 
 	.hero {
 		min-height: 650px;
